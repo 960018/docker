@@ -76,7 +76,7 @@ services:
         mem_limit: 256M
 
     keydb:
-        image: keydb:latest
+        image: eqalpha/keydb:latest
         container_name: keydb
         networks:
             - backend
