@@ -84,8 +84,6 @@ services:
         volumes:
             - ./keydb/keydb.conf:/etc/keydb/keydb.conf
             - redisdata:/data
-            - /etc/timezone:/etc/timezone:ro
-            - /etc/localtime:/etc/localtime:ro
         ports:
             - 6379:6379 
         command: keydb-server /etc/keydb/keydb.conf --requirepass Bqox56ewGRxrUY5MzFUNx0w23AXN0MY9 
@@ -107,9 +105,6 @@ services:
             - "traefik.http.routers.mailhog.entrypoints=https"
             - "traefik.http.routers.mailhog.tls=true"
             - "traefik.http.services.mailhog.loadbalancer.server.port=8025"
-        volumes:
-            - /etc/timezone:/etc/timezone:ro
-            - /etc/localtime:/etc/localtime:ro
         mem_limit: 64M
 
     gotenberg:
@@ -132,8 +127,6 @@ services:
         volumes:
             - ./postgres:/var/lib/postgresql/data
             - ./pg:/data
-            - /etc/timezone:/etc/timezone:ro
-            - /etc/localtime:/etc/localtime:ro
         restart: always
         networks:
             - backend
@@ -149,8 +142,6 @@ services:
         volumes:
             - ./postgres15:/var/lib/postgresql/data
             - ./pg:/data
-            - /etc/timezone:/etc/timezone:ro
-            - /etc/localtime:/etc/localtime:ro
         restart: always
         networks:
             - backend
