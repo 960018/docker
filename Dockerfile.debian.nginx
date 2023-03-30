@@ -1,0 +1,52 @@
+FROM    nginx:1.23.4-bullseye as builder
+
+LABEL   maintainer="support+docker@vairogs.com"
+ENV     container=docker
+ENV     DEBIAN_FRONTEND=noninteractive
+
+SHELL   ["/bin/bash", "-o", "pipefail", "-c"]
+
+COPY    global/01_nodoc /etc/dpkg/dpkg.cfg.d/01_nodoc
+COPY    global/02nocache /etc/apt/apt.conf.d/02nocache
+COPY    global/compress /etc/initramfs-tools/conf.d/compress
+COPY    global/modules /etc/initramfs-tools/conf.d/modules
+
+USER    root
+
+RUN     \
+        set -eux \
+&&      usermod -l vairogs nginx \
+&&      usermod -d /home/vairogs -m vairogs \
+&&      groupmod -n vairogs nginx \
+&&      usermod -u 1000 vairogs \
+&&      groupmod -g 1000 vairogs \
+&&      mkdir --parents /home/vairogs \
+&&      echo >> /home/vairogs/.bashrc \
+&&      echo 'alias ll="ls -lahs"' >> /home/vairogs/.bashrc \
+&&      echo 'alias ll="ls -lahs"' >> /root/.bashrc \
+&&      apt-get update \
+&&      apt-get upgrade -y \
+&&      apt-get install -y --no-install-recommends bash procps \
+&&      apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
+&&      apt-get autoremove -y \
+&&      rm -rf \
+            /etc/nginx/conf.d/* \
+            /home/vairogs/*.deb \
+            /*.deb \
+            /tmp/* \
+            /usr/share/man \
+            /usr/share/doc \
+            /usr/local/share/man \
+            /var/lib/apt/lists/* \
+            /usr/lib/python3.11/__pycache__ \
+            /docker-entrypoint.d/10-listen-on-ipv6-by-default.sh \
+&&      chown -R vairogs:vairogs /var/cache/nginx \
+&&      chown -R vairogs:vairogs /var/log/nginx \
+&&      chown -R vairogs:vairogs /etc/nginx/conf.d \
+&&      touch /var/run/nginx.pid \
+&&      chown -R vairogs:vairogs /var/run/nginx.pid
+
+WORKDIR /var/www/html
+
+USER    vairogs
+

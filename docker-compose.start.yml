@@ -1,0 +1,156 @@
+networks:
+    frontend:
+        name: frontend
+    backend:
+        name: backend
+
+services:
+
+    traefik:
+        image: traefik:3.0.0-beta2
+        container_name: traefik
+        ports:
+            - 80:80
+            - 443:443/tcp
+            - 4443:443/udp
+            - 8082:8080
+        networks:
+            - frontend
+            - backend
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+            - ./traefik:/etc/traefik
+            - ./dynamic_conf:/dynamic_conf
+            - ./certs:/dynamic_conf/certs
+        restart: always
+        command:
+            - --log
+            - --log.level=ERROR
+            - --api.insecure
+            - --providers.docker
+            - --providers.docker.exposedbydefault=false
+            - --providers.docker.network=frontend
+            - --accessLog
+            - --accessLog.filePath=/etc/traefik/log/access.log
+            - --log.filePath=/etc/traefik/log/error.log
+            - --providers.file.directory=/dynamic_conf
+            - --providers.file.filename=/dynamic_conf/traefik_dynamic.yml
+            - --providers.file.watch
+            - --entryPoints.http.address=:80
+            - --entryPoints.https.address=:443
+            - --entryPoints.http.forwardedHeaders.insecure
+            - --entryPoints.https.forwardedHeaders.insecure
+            - --ping
+            - --ping.entryPoint=https
+            - --providers.docker.watch
+            - --entrypoints.http3.http3=true
+            - --entrypoints.http3.http3.advertisedport=443
+            - --entryPoints.http3.address=:443
+            - --entryPoints.http3.address=:443/udp
+            - --entryPoints.http3.forwardedHeaders.insecure
+            - --entrypoints.http.http.redirections.entryPoint.to=https
+            - --entrypoints.https.http.redirections.entryPoint.scheme=https
+            - --entrypoints.https.http.redirections.entrypoint.permanent=true
+            - --serversTransport.insecureSkipVerify=true
+        labels:
+            - traefik.enable=true
+            - traefik.docker.network=frontend
+            - traefik.http.routers.gateway.rule=Host(`localhost`)
+            - traefik.http.routers.gateway.service=api@internal
+            - traefik.http.routers.gateway.entrypoints=https
+            - traefik.http.routers.gateway.tls=true
+            - traefik.http.services.gateway.loadbalancer.server.port=8080
+            - traefik.http.routers.ping.tls=true
+            - traefik.http.routers.ping.rule=Host(`localhost`) && PathPrefix(`/ping`)
+            - traefik.http.routers.ping.service=ping@internal
+        healthcheck:
+            test: wget --spider https://localhost/ping --no-check-certificate || exit 1
+            interval: 30s
+            timeout: 30s
+            retries: 3
+        security_opt:
+            - apparmor=unconfined
+        mem_limit: 256M
+
+    keydb:
+        image: keydb:latest
+        container_name: keydb
+        networks:
+            - backend
+        restart: always
+        volumes:
+            - ./keydb/keydb.conf:/etc/keydb/keydb.conf
+            - redisdata:/data
+            - /etc/timezone:/etc/timezone:ro
+            - /etc/localtime:/etc/localtime:ro
+        ports:
+            - 6379:6379 
+        command: keydb-server /etc/keydb/keydb.conf --requirepass Bqox56ewGRxrUY5MzFUNx0w23AXN0MY9 
+        mem_limit: 64M
+
+    mailhog:
+        image: druidfi/mailhog
+        container_name: mailhog
+        restart: always
+        networks:
+            - backend
+            - frontend
+        ports:
+            - 1025:1025
+        labels:
+            - "traefik.enable=true"
+            - "traefik.docker.network=frontend"
+            - "traefik.http.routers.mailhog.rule=Host(`mailhog.docker.local`)"
+            - "traefik.http.routers.mailhog.entrypoints=https"
+            - "traefik.http.routers.mailhog.tls=true"
+            - "traefik.http.services.mailhog.loadbalancer.server.port=8025"
+        volumes:
+            - /etc/timezone:/etc/timezone:ro
+            - /etc/localtime:/etc/localtime:ro
+        mem_limit: 64M
+
+    gotenberg:
+        container_name: gotenberg
+        image: gotenberg/gotenberg:7.8.1
+        command:
+            - "gotenberg"
+            - "--chromium-ignore-certificate-errors=true"
+            - "--chromium-allow-insecure-localhost=true"
+        restart: always
+        networks:
+            - backend
+        mem_limit: 64M
+
+    postgres13:
+        image: postgres:13.10-bullseye
+        container_name: postgres13
+        environment:
+            POSTGRES_PASSWORD: 'Bqox56ewGRxrUY5MzFUNx0w23AXN0MY9'
+        volumes:
+            - ./postgres:/var/lib/postgresql/data
+            - ./pg:/data
+            - /etc/timezone:/etc/timezone:ro
+            - /etc/localtime:/etc/localtime:ro
+        restart: always
+        networks:
+            - backend
+        ports:
+            - 5433:5432
+        mem_limit: 1G
+
+    postgres15:
+        image: postgres:15.2-bullseye
+        container_name: postgres15
+        environment:
+            POSTGRES_PASSWORD: 'Bqox56ewGRxrUY5MzFUNx0w23AXN0MY9'
+        volumes:
+            - ./postgres15:/var/lib/postgresql/data
+            - ./pg:/data
+            - /etc/timezone:/etc/timezone:ro
+            - /etc/localtime:/etc/localtime:ro
+        restart: always
+        networks:
+            - backend
+        ports:
+            - 5435:5432
+        mem_limit: 256M
