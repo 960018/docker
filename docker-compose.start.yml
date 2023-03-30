@@ -1,8 +1,13 @@
 networks:
+
     frontend:
         name: frontend
+
     backend:
         name: backend
+
+volumes:
+    redisdata:
 
 services:
 
@@ -68,8 +73,6 @@ services:
             interval: 30s
             timeout: 30s
             retries: 3
-        security_opt:
-            - apparmor=unconfined
         mem_limit: 256M
 
     keydb:
@@ -153,4 +156,5 @@ services:
             - backend
         ports:
             - 5435:5432
-        mem_limit: 256M
+        mem_limit: 1G
+
