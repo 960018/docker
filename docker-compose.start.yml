@@ -125,7 +125,7 @@ services:
         environment:
             POSTGRES_PASSWORD: 'Bqox56ewGRxrUY5MzFUNx0w23AXN0MY9'
         volumes:
-            - ./postgres:/var/lib/postgresql/data
+            - ./postgres:/var/lib/postgresql
             - ./pg:/data
         restart: always
         networks:
@@ -140,7 +140,7 @@ services:
         environment:
             POSTGRES_PASSWORD: 'Bqox56ewGRxrUY5MzFUNx0w23AXN0MY9'
         volumes:
-            - ./postgres15:/var/lib/postgresql/data
+            - ./postgres15:/var/lib/postgresql
             - ./pg:/data
         restart: always
         networks:
