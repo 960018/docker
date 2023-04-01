@@ -1,0 +1,81 @@
+ARG     OS
+
+FROM    ghcr.io/960018/debian:php-fpm-$OS as builder
+
+ARG     OS
+
+USER    root
+
+ENV     PHP_INI_DIR /usr/local/etc/php
+ENV     PHP_CFLAGS "-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
+ENV     PHP_CPPFLAGS "$PHP_CFLAGS"
+ENV     PHP_LDFLAGS "-Wl,-O1 -pie"
+
+COPY    php/docker-php-ext-enable /usr/local/bin/docker-php-ext-enable
+
+COPY    php/clone/xdebugsrc/ /home/vairogs/extensions/xdebug/
+COPY    php/clone/runkit7src/ /home/vairogs/extensions/runkit7/
+
+RUN     \
+        set -eux \
+&&      chmod -R 777 /usr/local/bin \
+&&      mkdir --parents /home/vairogs/extensions
+
+WORKDIR /home/vairogs/extensions
+
+RUN     \
+        set -eux \
+&&      ( \
+            cd xdebug \
+            &&  phpize \
+            &&  autoupdate \
+            &&  ./configure --enable-xdebug \
+            &&  make -j "$(expr $(nproc) / 3)" \
+            &&  make install \
+            &&  cd .. || exit \
+        ) \
+&&      docker-php-ext-enable xdebug \
+&&      ( \
+            cd  runkit7 \
+            &&  phpize \
+            &&  ./configure \
+            &&  make -j "$(expr $(nproc) / 3)" \
+            &&  make install \
+            &&  cd .. || exit \
+        ) \
+&&      docker-php-ext-enable runkit7 \
+&&      echo xdebug.mode=debug,coverage >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+&&      echo xdebug.discover_client_host=0 >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+&&      echo xdebug.client_host=host.docker.internal >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+&&      echo xdebug.log=/tmp/xdebug.log >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+&&      echo runkit.internal_override=1 >> /usr/local/etc/php/conf.d/docker-php-ext-runkit7.ini \
+&&      echo 'alias upd="composer update -nW --ignore-platform-reqs"' >> /home/vairogs/.bashrc \
+&&      echo 'alias ins="composer install -n --ignore-platform-reqs"' >> /home/vairogs/.bashrc \
+&&      echo 'alias req="composer require -nW --ignore-platform-reqs"' >> /home/vairogs/.bashrc \
+&&      echo 'alias rem="composer remove -nW --ignore-platform-reqs"' >> /home/vairogs/.bashrc \
+&&      rm -rf \
+            /*.deb \
+            /home/vairogs/*.deb \
+            /home/vairogs/*.gz \
+            /home/vairogs/extensions \
+            /home/vairogs/installer \
+            /tmp/* \
+            /usr/local/bin/docker-php-ext-enable \
+            /usr/local/bin/phpdbg \
+            /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini \
+            /usr/local/etc/php/php.ini-development \
+            /usr/local/etc/php/php.ini-production \
+            /usr/local/php/man/* \
+            /usr/src/php \
+            /var/cache/* \
+            ~/.pearrc \
+            /tmp/* \
+&&      chown -R vairogs:vairogs /home/vairogs
+
+COPY    php/exts/opcache.jit.ini /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
+
+WORKDIR /var/www/html
+
+USER    vairogs
+
+CMD     ["sh", "-c", "php-fpm && /bin/bash"]

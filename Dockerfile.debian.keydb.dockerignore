@@ -1,0 +1,4 @@
+*
+!Dockerfile.debian.keydb
+!global/
+!keydb/

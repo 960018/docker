@@ -6,23 +6,18 @@ eval $(cat msh3.txt)
 eval $(cat curl.txt)
 cd ..
 
-# cd keydb
-# rm -rf source src
-# eval $(cat keydb.txt)
-# cd ..
+cd php
+rm -rf source src
+eval $(cat php.txt)
+cd clone
 
-# cd nginx
-# rm -rf source src
-# eval $(cat nginx.txt)
-# cd ..
+exts=("apcu" "eio" "ev" "event" "igbinary" "imagick" "phpredis" "phpiredis" "runkit7" "uv" "xdebug")
 
-# cd php
-# rm -rf source src
-# eval $(cat php.txt)
-# cd ..
+for i in "${exts[@]}"
+do
+    rm -rf "$i"
+    eval $(cat "${i}.txt")
+done
 
-# cd traefik
-# rm -rf source src
-# eval $(cat traefik.txt)
-# cd ..
-
+cd ..
+cd ..

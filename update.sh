@@ -22,57 +22,33 @@ rm -rf .git/ .github/
 cd ..
 cd ..
 
-# cd keydb
-# rm -rf src
-# cd source
-# git reset --hard; 
-# git pull; 
-# git submodule update --init --force;
-# cd ..
-# cp -r source src
-# cd src
-# rm -rf .git/ .github/
-# cd ..
-# cd ..
+cd php
+rm -rf src
+cd source
+git reset --hard; 
+git pull; 
+git submodule update --init --force;
+cd ..
+cp -r source src
+cd src
+rm -rf .git/ .github/
+cd ..
+cd clone
 
-# cd traefik
-# rm -rf src
-# cd source
-# git reset --hard; 
-# git pull; 
-# git submodule update --init --force;
-# cd ..
-# cp -r source src
-# cd src
-# rm -rf .github/ .dist/
-# sed -i 's/ARG DOCKER_VERSION=18.09.7/ARG DOCKER_VERSION=23.0.2/g' build.Dockerfile
-# sed -i 's/static\/stable\/x86_64/static\/test\/aarch64/g' build.Dockerfile
-# sed -i 's/apk --no-cache --no-progress/apk --no-cache --no-progress --upgrade --update -X http:\/\/dl-cdn.alpinelinux.org\/alpine\/edge\/testing/g' build.Dockerfile
-# cd ..
-# cd ..
+exts=("apcu" "eio" "ev" "event" "igbinary" "imagick" "phpredis" "phpiredis" "runkit7" "uv" "xdebug")
 
-# cd php
-# rm -rf src
-# cd source
-# git reset --hard; 
-# git pull; 
-# git submodule update --init --force;
-# cd ..
-# cp -r source src
-# cd src
-# rm -rf .git/ .github/
-# cd ..
-# cd ..
+for i in "${exts[@]}"
+do
+    cd "$i"
+    git reset --hard; 
+    git pull; 
+    git submodule update --init --force;
+    cd ..
+    rm -rf "${i}src"
+    cp -r "$i" "${i}src"
+    cd "${i}src"
+    rm -rf .git/ .github/
+    cd ..
+done
 
-# cd nginx
-# rm -rf src
-# cd source
-# git reset --hard; 
-# git pull; 
-# git submodule update --init --force;
-# cd ..
-# cp -r source src
-# cd src
-# rm -rf .git/ .github/
-# cd ..
-# cd ..
+cd ..

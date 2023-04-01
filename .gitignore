@@ -1,8 +1,12 @@
-
 curl/msh3/
-
 curl/msrc/
-
 curl/source/
-
 curl/src/
+pg/
+postgres13/
+postgres15/
+traefik/
+php/src/
+php/source/
+php/clone/*
+!php/clone/.gitignore

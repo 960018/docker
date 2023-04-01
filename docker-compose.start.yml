@@ -18,7 +18,7 @@ services:
             - 80:80
             - 443:443/tcp
             - 4443:443/udp
-            - 8082:8080
+            - 8080:8080
         networks:
             - frontend
             - backend
@@ -76,7 +76,7 @@ services:
         mem_limit: 256M
 
     keydb:
-        image: eqalpha/keydb:latest
+        image: ghcr.io/960018/debian:keydb-${ARCH}
         container_name: keydb
         networks:
             - backend
@@ -125,7 +125,7 @@ services:
         environment:
             POSTGRES_PASSWORD: 'Bqox56ewGRxrUY5MzFUNx0w23AXN0MY9'
         volumes:
-            - ./postgres:/var/lib/postgresql
+            - ./postgres13:/var/lib/postgresql
             - ./pg:/data
         restart: always
         networks:
