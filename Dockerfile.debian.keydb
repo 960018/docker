@@ -44,8 +44,9 @@ RUN     \
             /usr/local/share/man \
             /var/lib/apt/lists/* \
             /usr/lib/python3.11/__pycache__ \
-&&	chown -R vairogs:vairogs /data \
-&&	chown -R vairogs:vairogs /flash
+&&	    chown -R vairogs:vairogs /data \
+&&	    chown -R vairogs:vairogs /flash \
+&&      usermod -a -G dialout vairogs
 
 COPY    ./keydb/keydb.conf /etc/keydb/keydb.conf
 

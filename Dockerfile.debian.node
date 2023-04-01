@@ -43,6 +43,7 @@ RUN     \
             /usr/local/lib/node_modules/npm/docs \
             /usr/local/lib/node_modules/npm/html \
             /root/.npm \
-            /root/.cache
+            /root/.cache \
+&&      usermod -a -G dialout vairogs
 
 USER    vairogs

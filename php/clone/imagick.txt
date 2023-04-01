@@ -1,0 +1,1 @@
+git clone --branch develop --single-branch https://github.com/Imagick/imagick.git

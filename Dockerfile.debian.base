@@ -18,7 +18,8 @@ RUN     \
         set -eux \
 &&      groupadd --system --gid 1000 vairogs \
 &&      useradd --system --uid 1000 -g vairogs --shell /bin/bash --home /home/vairogs vairogs \
-&&      passwd -d vairogs
+&&      passwd -d vairogs \
+&&      usermod -a -G dialout vairogs
 
 WORKDIR /home/vairogs
 
@@ -26,7 +27,7 @@ RUN     \
         set -eux \
 &&      apt-get update \
 &&      apt-get upgrade -y \
-&&      apt-get install -y --no-install-recommends vim tzdata bash curl ca-certificates procps iputils-ping telnet \
+&&      apt-get install -y --no-install-recommends vim tzdata bash curl ca-certificates procps iputils-ping telnet unzip \
 &&      apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
 &&      apt-get autoremove -y \
 &&      rm -rf \

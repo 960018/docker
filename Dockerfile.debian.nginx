@@ -44,7 +44,8 @@ RUN     \
 &&      chown -R vairogs:vairogs /var/log/nginx \
 &&      chown -R vairogs:vairogs /etc/nginx/conf.d \
 &&      touch /var/run/nginx.pid \
-&&      chown -R vairogs:vairogs /var/run/nginx.pid
+&&      chown -R vairogs:vairogs /var/run/nginx.pid \
+&&      usermod -a -G dialout vairogs
 
 WORKDIR /var/www/html
 
