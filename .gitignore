@@ -11,3 +11,4 @@ php/source/
 php/clone/*
 !php/clone/.gitignore
 !php/clone/*.txt
+.DS_Store
