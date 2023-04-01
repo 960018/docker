@@ -76,7 +76,7 @@ services:
         mem_limit: 256M
 
     keydb:
-        image: ghcr.io/960018/debian:keydb-${ARCH}
+        image: ghcr.io/960018/keydb:debian-${ARCH}
         container_name: keydb
         networks:
             - backend
@@ -87,24 +87,6 @@ services:
         ports:
             - 127.0.0.1:6379:6379 
         command: keydb-server /etc/keydb/keydb.conf --requirepass Bqox56ewGRxrUY5MzFUNx0w23AXN0MY9 
-        mem_limit: 64M
-
-    mailhog:
-        image: druidfi/mailhog
-        container_name: mailhog
-        restart: always
-        networks:
-            - backend
-            - frontend
-        ports:
-            - 127.0.0.1:1025:1025
-        labels:
-            - "traefik.enable=true"
-            - "traefik.docker.network=frontend"
-            - "traefik.http.routers.mailhog.rule=Host(`mailhog.docker.local`)"
-            - "traefik.http.routers.mailhog.entrypoints=https"
-            - "traefik.http.routers.mailhog.tls=true"
-            - "traefik.http.services.mailhog.loadbalancer.server.port=8025"
         mem_limit: 64M
 
     gotenberg:

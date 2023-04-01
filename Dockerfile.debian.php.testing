@@ -1,6 +1,6 @@
 ARG     OS
 
-FROM    ghcr.io/960018/debian:php-fpm-$OS as builder
+FROM    ghcr.io/960018/php-fpm:debian-$OS as builder
 
 ARG     OS
 
@@ -25,6 +25,9 @@ WORKDIR /home/vairogs/extensions
 
 RUN     \
         set -eux \
+&&      apt-get update \
+&&      apt-get upgrade -y \
+&&      apt-get install -y --no-install-recommends autoconf dpkg-dev dpkg file g++ gcc libc-dev make pkgconf re2c bison \
 &&      ( \
             cd xdebug \
             &&  phpize \
@@ -53,6 +56,14 @@ RUN     \
 &&      echo 'alias ins="composer install -n --ignore-platform-reqs"' >> /home/vairogs/.bashrc \
 &&      echo 'alias req="composer require -nW --ignore-platform-reqs"' >> /home/vairogs/.bashrc \
 &&      echo 'alias rem="composer remove -nW --ignore-platform-reqs"' >> /home/vairogs/.bashrc \
+&&      apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false autotools-dev dpkg-dev libargon2-dev libblkid-dev libbrotli-dev libbsd-dev libbz2-dev libc6-dev libcairo2-dev libcrypt-dev libdeflate-dev \
+        libdjvulibre-dev libedit-dev libexif-dev libexpat1-dev libffi-dev libfontconfig-dev libfreetype-dev libgcc-12-dev libgdk-pixbuf-2.0-dev libglib2.0-dev libgmp-dev libgnutls28-dev libgsasl-dev libgssglue-dev \
+        libhiredis-dev libice-dev libicu-dev libidn-dev libidn11-dev libidn2-dev libimath-dev libjbig-dev libjpeg62-turbo-dev liblcms2-dev liblerc-dev liblqr-1-0-dev libltdl-dev liblz4-dev liblzf-dev liblzma-dev \
+        libmagickcore-6.q16-dev libmagickcore-dev libmagickwand-6.q16-dev libmagickwand-dev libmd-dev libmount-dev libncurses-dev libnghttp2-dev libnghttp3-dev libnsl-dev libntlm0-dev libonig-dev libopenexr-dev \
+        libopenjp2-7-dev libp11-kit-dev libpcre2-dev libpixman-1-dev libpng-dev libpq-dev libpsl-dev libpthread-stubs0-dev libreadline-dev librsvg2-dev librtmp-dev libselinux1-dev libsepol-dev libsm-dev libsodium-dev \
+        libsqlite3-dev libssl-dev libstdc++-12-dev libtasn1-6-dev libtidy-dev libtiff-dev libtirpc-dev libuv1-dev libwebp-dev libwmf-dev libx11-dev libxau-dev libxcb-render0-dev libxcb-shm0-dev libxcb1-dev libxdmcp-dev \
+        libxext-dev libxml2-dev libxrender-dev libxt-dev libzip-dev libzstd-dev linux-libc-dev nettle-dev uuid-dev x11proto-core-dev x11proto-dev xtrans-dev zlib1g-dev autoconf g++ gcc libc-dev make pkgconf \
+&&      apt-get autoremove -y \
 &&      rm -rf \
             /*.deb \
             /home/vairogs/*.deb \
@@ -70,6 +81,7 @@ RUN     \
             /var/cache/* \
             ~/.pearrc \
             /tmp/* \
+            /usr/share/vim/vim90/doc \
 &&      chown -R vairogs:vairogs /home/vairogs
 
 COPY    php/exts/opcache.jit.ini /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini

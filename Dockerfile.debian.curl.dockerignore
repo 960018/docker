@@ -2,3 +2,4 @@
 !Dockerfile.debian.curl
 !curl/src/
 !curl/msrc/
+!global/
