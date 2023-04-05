@@ -1,6 +1,6 @@
 ARG     OS
 
-FROM    ghcr.io/960018/php-fpm:debian-$OS as builder
+FROM    ghcr.io/960018/php-fpm:$OS as builder
 
 ARG     OS
 
@@ -38,20 +38,20 @@ RUN     \
             &&  cd .. || exit \
         ) \
 &&      docker-php-ext-enable xdebug \
-&&      ( \
-            cd  runkit7 \
-            &&  phpize \
-            &&  ./configure \
-            &&  make -j "$(expr $(nproc) / 3)" \
-            &&  make install \
-            &&  cd .. || exit \
-        ) \
-&&      docker-php-ext-enable runkit7 \
+# &&      ( \
+#             cd  runkit7 \
+#             &&  phpize \
+#             &&  ./configure \
+#             &&  make -j "$(expr $(nproc) / 3)" \
+#             &&  make install \
+#             &&  cd .. || exit \
+#         ) \
+# &&      docker-php-ext-enable runkit7 \
 &&      echo xdebug.mode=debug,coverage >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
 &&      echo xdebug.discover_client_host=0 >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
 &&      echo xdebug.client_host=host.docker.internal >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
 &&      echo xdebug.log=/tmp/xdebug.log >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-&&      echo runkit.internal_override=1 >> /usr/local/etc/php/conf.d/docker-php-ext-runkit7.ini \
+# &&      echo runkit.internal_override=1 >> /usr/local/etc/php/conf.d/docker-php-ext-runkit7.ini \
 &&      echo 'alias upd="composer update -nW --ignore-platform-reqs"' >> /home/vairogs/.bashrc \
 &&      echo 'alias ins="composer install -n --ignore-platform-reqs"' >> /home/vairogs/.bashrc \
 &&      echo 'alias req="composer require -nW --ignore-platform-reqs"' >> /home/vairogs/.bashrc \

@@ -1,6 +1,6 @@
 ARG     OS
 
-FROM    ghcr.io/960018/curl:debian-$OS as builder
+FROM    ghcr.io/960018/curl:$OS as builder
 
 ARG     OS
 

@@ -76,7 +76,7 @@ services:
         mem_limit: 256M
 
     keydb:
-        image: ghcr.io/960018/keydb:debian-${ARCH}
+        image: ghcr.io/960018/keydb:${ARCH}
         container_name: keydb
         networks:
             - backend
