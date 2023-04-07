@@ -1,3 +1,4 @@
 *
 !Dockerfile.debian.nginx
 !global/
+!nginx/

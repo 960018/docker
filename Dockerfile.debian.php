@@ -15,7 +15,6 @@ ENV     PHP_LDFLAGS "-Wl,-O1 -pie"
 COPY    php/no-debian-php /etc/apt/preferences.d/no-debian-php
 COPY    php/ping.sh /usr/local/bin/php-fpm-ping
 COPY    php/src/ /usr/src/php
-COPY    php/pickle.phar /usr/local/bin/pickle.phar
 COPY    php/installer /home/vairogs/installer
 COPY    php/docker-php-entrypoint /usr/local/bin/docker-php-entrypoint
 COPY    php/docker-php-ext-configure /usr/local/bin/docker-php-ext-configure
@@ -24,12 +23,11 @@ COPY    php/docker-php-ext-install /usr/local/bin/docker-php-ext-install
 COPY    php/docker-php-source /usr/local/bin/docker-php-source
 
 COPY    php/redis/ /home/vairogs/
+COPY    --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
 ENTRYPOINT ["docker-php-entrypoint"]
 
 STOPSIGNAL SIGQUIT
-
-EXPOSE 9000
 
 WORKDIR /home/vairogs
 
@@ -37,11 +35,10 @@ RUN     \
         set -eux \
 &&      apt-get update \
 &&      apt-get upgrade -y \
-&&      apt-get install -y --no-install-recommends autoconf dpkg-dev dpkg file g++ gcc libc-dev make pkgconf re2c bison libxml2-dev libxml2 libssl-dev libssl3 libsqlite3-dev libsqlite3-0 xz-utils libargon2-dev libargon2-1 \
+&&      apt-get install -y --no-install-recommends build-essential bison git autoconf dpkg-dev dpkg re2c libxml2-dev libxml2 libssl-dev libssl3 libsqlite3-dev libsqlite3-0 xz-utils libargon2-dev libargon2-1 \
         libonig-dev libonig5 libreadline-dev libreadline8 libsodium-dev libsodium23 zlib1g-dev zlib1g libbz2-dev libbz2-1.0 libgmp-dev libgmp10 libedit-dev libedit2 libtidy-dev libtidy5deb1 libnghttp3-dev libnghttp3-3 \
-        libnghttp2-dev nghttp2 idn2 libidn2-0 librtmp-dev librtmp1 rtmpdump libgsasl-dev libgsasl18 libpsl-dev libpsl5 zstd libzstd-dev libbrotli1 libbrotli-dev libjpeg62-turbo liblzf-dev liblzf1 \
-        libjpeg62-turbo-dev libpng16-16 libpng-dev libuv1 libuv1-dev libwebp7 libwebp-dev libfreetype-dev libfreetype6 postgresql-client postgresql libpq-dev libpq5 libzip-dev libzip4 liblz4-dev liblz4-1 \
-        libmagickcore-dev imagemagick-6-common imagemagick libmagickwand-dev git \
+        libnghttp2-dev nghttp2 idn2 libidn2-0 librtmp-dev librtmp1 rtmpdump libgsasl-dev libgsasl18 libpsl-dev libpsl5 zstd libzstd-dev libbrotli1 libbrotli-dev libjpeg62-turbo libjpeg62-turbo-dev libpng16-16 libpng-dev \
+        libwebp7 libwebp-dev libfreetype-dev libfreetype6 liblzf-dev liblzf1 liblzf-dev liblzf1 liblz4-dev liblzf-dev liblz4-1 \
 &&      dpkg -i /home/vairogs/libhiredis-$OS.deb \
 &&      dpkg -i /home/vairogs/libhiredis-dev-$OS.deb \
 &&      chmod -R 777 /usr/local/bin \
@@ -121,25 +118,15 @@ RUN     \
 &&      touch /run/php-fpm/.keep_dir \
 &&      cat /home/vairogs/installer | php -- --install-dir=/usr/local/bin --filename=composer \
 &&      composer self-update --snapshot \
-&&      chmod +x /usr/local/bin/pickle.phar \
 &&      export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" \
 &&      docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ --with-webp=/usr/include/ \
-&&      pickle.phar install -n inotify \
-&&      pickle.phar install -n msgpack \
-&&      pickle.phar install -n lzf \
-&&      docker-php-ext-install pdo_pgsql pgsql gd zip \
-&&      docker-php-ext-enable gd msgpack inotify opcache pdo_pgsql pgsql zip lzf \
-&&      mkdir --parents /home/vairogs/extensions
+&&      docker-php-ext-install gd \
+&&      docker-php-ext-enable gd \
+&&      mkdir --parents /home/vairogs/extensions \
+&&      install-php-extensions php-memcached-dev/php-memcached@master inotify msgpack lzf pdo_pgsql pgsql zip krakjoe/apcu@master igbinary/igbinary@master Imagick/imagick@develop event
 
-COPY    php/clone/apcusrc/ /home/vairogs/extensions/apcu/
-COPY    php/clone/eiosrc/ /home/vairogs/extensions/eio/
-COPY    php/clone/evsrc/ /home/vairogs/extensions/ev/
-COPY    php/clone/eventsrc/ /home/vairogs/extensions/event/
-COPY    php/clone/igbinarysrc/ /home/vairogs/extensions/igbinary/
-COPY    php/clone/imagicksrc/ /home/vairogs/extensions/imagick/
 COPY    php/clone/phpredissrc/ /home/vairogs/extensions/phpredis/
 COPY    php/clone/phpiredissrc/ /home/vairogs/extensions/phpiredis/
-COPY    php/clone/uvsrc/ /home/vairogs/extensions/uv/
 
 WORKDIR /home/vairogs/extensions
 
@@ -148,27 +135,8 @@ ARG     RELAY
 RUN     \
         set -eux \
 &&      ( \
-            cd  apcu \
-            &&  phpize \
-            &&  ./configure \
-            &&  make -j "$(expr $(nproc) / 3)" \
-            &&  make install \
-            &&  cd .. || exit \
-        ) \
-&&      docker-php-ext-enable apcu \
-&&      ( \
-            cd  igbinary \
-            &&  phpize \
-            &&  ./configure CFLAGS="-O2 -g" --enable-igbinary \
-            &&  make -j "$(expr $(nproc) / 3)" \
-            &&  make install \
-            &&  cd .. || exit \
-        ) \
-&&      docker-php-ext-enable igbinary \
-&&      ( \
             cd  phpredis \
             &&  phpize \
-            # &&  ./configure --enable-redis-zstd --enable-redis-msgpack --enable-redis-lzf --with-liblzf --enable-redis-lz4 --with-liblz4 \
             &&  ./configure --enable-redis-igbinary --enable-redis-zstd --enable-redis-msgpack --enable-redis-lzf --with-liblzf --enable-redis-lz4 --with-liblz4 \
             &&  make -j "$(expr $(nproc) / 3)" \
             &&  make install \
@@ -184,55 +152,16 @@ RUN     \
             &&  cd .. || exit \
         ) \
 &&      docker-php-ext-enable phpiredis \
-&&      ( \
-            cd  imagick \
-            &&  phpize \
-            &&  ./configure \
-            &&  make -j "$(expr $(nproc) / 3)" \
-            &&  make install \
-            &&  cd .. || exit \
-        ) \
-&&      docker-php-ext-enable imagick \
-&&      ( \
-            cd  uv \
-            &&  phpize \
-            &&  ./configure \
-            &&  make -j "$(expr $(nproc) / 3)" \
-            &&  make install \
-            &&  cd .. || exit \
-        ) \
-&&      docker-php-ext-enable uv \
-&&      ( \
-            cd  ev \
-            &&  phpize \
-            &&  ./configure --enable-ev \
-            &&  make -j "$(expr $(nproc) / 3)" \
-            &&  make install \
-            &&  cd .. || exit \
-        ) \
-&&      docker-php-ext-enable ev \
-&&      ( \
-            cd  eio \
-            &&  phpize \
-            &&  ./configure --with-eio --enable-eio-sockets \
-            &&  make -j "$(expr $(nproc) / 3)" \
-            &&  make install \
-            &&  cd .. || exit \
-        ) \
-&&      docker-php-ext-enable eio \
 &&      curl -L "https://builds.r2.relay.so/dev/relay-dev-php8.3-debian-$RELAY+libssl3.tar.gz" | tar xz -C /tmp \
 &&      cp "/tmp/relay-dev-php8.3-debian-$RELAY+libssl3/relay-pkg.so" $(php-config --extension-dir)/relay.so \
 &&      sed -i "s/00000000-0000-0000-0000-000000000000/$(cat /proc/sys/kernel/random/uuid)/" $(php-config --extension-dir)/relay.so \
 &&      chmod 755 $(php-config --extension-dir)/relay.so \
 &&      touch /var/www/html/config/preload.php \
-&&      apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false autotools-dev dpkg-dev libargon2-dev libblkid-dev libbrotli-dev libbsd-dev libbz2-dev libc6-dev libcairo2-dev libcrypt-dev libdeflate-dev \
-        libdjvulibre-dev libedit-dev libexif-dev libexpat1-dev libffi-dev libfontconfig-dev libfreetype-dev libgcc-12-dev libgdk-pixbuf-2.0-dev libglib2.0-dev libgmp-dev libgnutls28-dev libgsasl-dev libgssglue-dev \
-        libhiredis-dev libice-dev libicu-dev libidn-dev libidn11-dev libidn2-dev libimath-dev libjbig-dev libjpeg62-turbo-dev liblcms2-dev liblerc-dev liblqr-1-0-dev libltdl-dev liblz4-dev liblzf-dev liblzma-dev \
-        libmagickcore-6.q16-dev libmagickcore-dev libmagickwand-6.q16-dev libmagickwand-dev libmd-dev libmount-dev libncurses-dev libnghttp2-dev libnghttp3-dev libnsl-dev libntlm0-dev libonig-dev libopenexr-dev \
-        libopenjp2-7-dev libp11-kit-dev libpcre2-dev libpixman-1-dev libpng-dev libpq-dev libpsl-dev libpthread-stubs0-dev libreadline-dev librsvg2-dev librtmp-dev libselinux1-dev libsepol-dev libsm-dev libsodium-dev \
-        libsqlite3-dev libssl-dev libstdc++-12-dev libtasn1-6-dev libtidy-dev libtiff-dev libtirpc-dev libuv1-dev libwebp-dev libwmf-dev libx11-dev libxau-dev libxcb-render0-dev libxcb-shm0-dev libxcb1-dev libxdmcp-dev \
-        libxext-dev libxml2-dev libxrender-dev libxt-dev libzip-dev libzstd-dev linux-libc-dev nettle-dev uuid-dev x11proto-core-dev x11proto-dev xtrans-dev zlib1g-dev autoconf g++ gcc libc-dev make pkgconf \
-&&      apt-get autoremove -y \
+&&      apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false build-essential autoconf dpkg-dev re2c bison libxml2-dev libssl-dev libsqlite3-dev xz-utils libargon2-dev libgcc-12-dev \
+        libnghttp3-dev libonig-dev libreadline-dev libsodium-dev zlib1g-dev libbz2-dev libgmp-dev libedit-dev libtidy-dev libnghttp2-dev librtmp-dev libgsasl-dev libpsl-dev libzstd-dev libcrypt-dev \
+        libbrotli-dev libjpeg62-turbo-dev libpng-dev libwebp-dev libfreetype-dev liblz4-dev liblzf-dev pkgconf make icu-devtools libbsd-dev libc-dev-bin libc6-dev libgssglue-dev libhiredis-dev libicu-dev \
+        libidn-dev libidn11-dev libidn2-dev libmd-dev libncurses-dev libnsl-dev libntlm0-dev libp11-kit-dev libstdc++-12-dev libtasn1-6-dev libtirpc-dev linux-libc-dev g++ gcc \
+&&      apt-get autoremove -y --purge \
 &&      rm -rf \
             ~/.pearrc \
             /home/vairogs/installer \
@@ -245,7 +174,6 @@ RUN     \
             /usr/local/bin/docker-php-ext-enable \
             /usr/local/bin/docker-php-ext-install \
             /usr/local/bin/docker-php-source \
-            /usr/local/bin/pickle.phar \
             /usr/local/bin/phpdbg \
             /usr/local/etc/php-fpm.conf \
             /usr/local/etc/php-fpm.d/* \
@@ -257,6 +185,8 @@ RUN     \
             /usr/local/etc/php/php.ini-development \
             /usr/local/etc/php/php.ini-production \
             /usr/share/vim/vim90/doc \
+            /usr/local/bin/install-php-extensions \
+            /usr/share/man/* \
 &&      mkdir --parents /var/lib/php/sessions \
 &&      chown -R vairogs:vairogs /var/lib/php/sessions \
 &&      mkdir --parents /var/lib/php/opcache \
@@ -279,5 +209,30 @@ RUN     \
 WORKDIR /var/www/html
 
 USER    vairogs
+
+CMD     ["sh", "-c", "php-fpm && /bin/bash"]
+
+FROM    scratch
+
+COPY    --from=builder / / 
+
+SHELL   ["/bin/bash", "-o", "pipefail", "-c"]
+
+ENV     PHP_VERSION 8.3.0-dev
+ENV     PHP_INI_DIR /usr/local/etc/php
+ENV     PHP_CFLAGS "-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
+ENV     PHP_CPPFLAGS "$PHP_CFLAGS"
+ENV     PHP_LDFLAGS "-Wl,-O1 -pie"
+LABEL   maintainer="support+docker@vairogs.com"
+ENV     container=docker
+ENV     DEBIAN_FRONTEND=noninteractive
+
+STOPSIGNAL SIGQUIT
+
+WORKDIR /var/www/html
+
+USER    vairogs
+
+EXPOSE  9000
 
 CMD     ["sh", "-c", "php-fpm && /bin/bash"]

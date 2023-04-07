@@ -116,6 +116,21 @@ services:
             - 127.0.0.1:5433:5432
         mem_limit: 1G
 
+    postgres14:
+        image: postgres:14.7-bullseye
+        container_name: postgres14
+        environment:
+            POSTGRES_PASSWORD: 'Bqox56ewGRxrUY5MzFUNx0w23AXN0MY9'
+        volumes:
+            - ./postgres14:/var/lib/postgresql
+            - ./pg:/data
+        restart: always
+        networks:
+            - backend
+        ports:
+            - 127.0.0.1:5434:5432
+        mem_limit: 1G
+
     postgres15:
         image: postgres:15.2-bullseye
         container_name: postgres15
