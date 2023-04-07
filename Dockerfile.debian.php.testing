@@ -93,12 +93,14 @@ COPY    --from=builder / /
 
 SHELL   ["/bin/bash", "-o", "pipefail", "-c"]
 
+LABEL   maintainer="support+docker@vairogs.com"
+LABEL   org.opencontainers.image.source https://github.com/960018/docker
+
 ENV     PHP_VERSION 8.3.0-dev
 ENV     PHP_INI_DIR /usr/local/etc/php
 ENV     PHP_CFLAGS "-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
 ENV     PHP_CPPFLAGS "$PHP_CFLAGS"
 ENV     PHP_LDFLAGS "-Wl,-O1 -pie"
-LABEL   maintainer="support+docker@vairogs.com"
 ENV     container=docker
 ENV     DEBIAN_FRONTEND=noninteractive
 

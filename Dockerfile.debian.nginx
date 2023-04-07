@@ -1,6 +1,5 @@
 FROM    nginx:1.23.4-bullseye as builder
 
-LABEL   maintainer="support+docker@vairogs.com"
 ENV     container=docker
 ENV     DEBIAN_FRONTEND=noninteractive
 
@@ -59,6 +58,8 @@ FROM    scratch
 COPY    --from=builder / / 
 
 LABEL   maintainer="support+docker@vairogs.com"
+LABEL   org.opencontainers.image.source https://github.com/960018/docker
+
 ENV     container=docker
 ENV     DEBIAN_FRONTEND=noninteractive
 
