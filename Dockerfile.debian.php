@@ -123,7 +123,8 @@ RUN     \
 &&      docker-php-ext-install gd \
 &&      docker-php-ext-enable gd \
 &&      mkdir --parents /home/vairogs/extensions \
-&&      install-php-extensions php-memcached-dev/php-memcached@master inotify msgpack lzf pdo_pgsql pgsql zip krakjoe/apcu@master igbinary/igbinary@master Imagick/imagick@develop event
+&&      install-php-extensions php-memcached-dev/php-memcached@master inotify msgpack lzf pdo_pgsql pgsql zip krakjoe/apcu@master igbinary/igbinary@master Imagick/imagick@develop event simdjson \
+        ev lz4 yac yaml zstd
 
 COPY    php/clone/phpredissrc/ /home/vairogs/extensions/phpredis/
 COPY    php/clone/phpiredissrc/ /home/vairogs/extensions/phpiredis/
