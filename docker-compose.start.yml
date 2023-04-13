@@ -12,7 +12,7 @@ volumes:
 services:
 
     traefik:
-        image: traefik:3.0.0-beta2
+        image: traefik:${TRAEFIK}
         container_name: traefik
         ports:
             - 127.0.0.1:80:80
@@ -26,7 +26,6 @@ services:
             - /var/run/docker.sock:/var/run/docker.sock
             - ./traefik:/etc/traefik
             - ./dynamic_conf:/dynamic_conf
-            - ./certs:/dynamic_conf/certs
         restart: always
         command:
             - --log
@@ -91,7 +90,7 @@ services:
 
     gotenberg:
         container_name: gotenberg
-        image: gotenberg/gotenberg:7.8.1
+        image: gotenberg/gotenberg:${GOTENBERG}
         command:
             - "gotenberg"
             - "--chromium-ignore-certificate-errors=true"
@@ -102,7 +101,7 @@ services:
         mem_limit: 64M
 
     postgres13:
-        image: postgres:13.10-bullseye
+        image: postgres:${POSTGRES13}
         container_name: postgres13
         environment:
             POSTGRES_PASSWORD: 'Bqox56ewGRxrUY5MzFUNx0w23AXN0MY9'
@@ -117,7 +116,7 @@ services:
         mem_limit: 1G
 
     postgres14:
-        image: postgres:14.7-bullseye
+        image: postgres:${POSTGRES14}
         container_name: postgres14
         environment:
             POSTGRES_PASSWORD: 'Bqox56ewGRxrUY5MzFUNx0w23AXN0MY9'
@@ -132,7 +131,7 @@ services:
         mem_limit: 1G
 
     postgres15:
-        image: postgres:15.2-bullseye
+        image: postgres:${POSTGRES15}
         container_name: postgres15
         environment:
             POSTGRES_PASSWORD: 'Bqox56ewGRxrUY5MzFUNx0w23AXN0MY9'

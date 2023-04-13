@@ -21,4 +21,13 @@ export ARCH
 
 docker login ghcr.io -u $CR_USER --password $CR_PAT
 
+source .env
+
+docker pull traefik:$TRAEFIK
+docker pull ghcr.io/960018/keydb:$ARCH
+docker pull gotenberg/gotenberg:$GOTENBERG
+docker pull postgres:$POSTGRES13
+docker pull postgres:$POSTGRES14
+docker pull postgres:$POSTGRES15
+
 docker compose -f docker-compose.start.yml up -d --force-recreate
