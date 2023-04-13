@@ -113,7 +113,7 @@ services:
             - backend
         ports:
             - 127.0.0.1:5433:5432
-        mem_limit: 1G
+        mem_limit: 256M
 
     postgres14:
         image: postgres:${POSTGRES14}
@@ -128,7 +128,7 @@ services:
             - backend
         ports:
             - 127.0.0.1:5434:5432
-        mem_limit: 1G
+        mem_limit: 256M
 
     postgres15:
         image: postgres:${POSTGRES15}
@@ -143,5 +143,5 @@ services:
             - backend
         ports:
             - 127.0.0.1:5435:5432
-        mem_limit: 1G
+        mem_limit: 256M
 
