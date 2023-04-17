@@ -1,4 +1,4 @@
-FROM    nginx:1.24.0-bullseye as builder
+FROM    nginx:1.24-bullseye as builder
 
 ENV     container=docker
 ENV     DEBIAN_FRONTEND=noninteractive

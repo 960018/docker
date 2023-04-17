@@ -52,3 +52,9 @@ do
 done
 
 cd ..
+
+docker pull mlocati/php-extension-installer
+docker pull eqalpha/keydb:latest
+docker pull debian:sid-slim
+docker pull nginx:1.24-bullseye
+docker pull node:19-bullseye-slim
