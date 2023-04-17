@@ -27,7 +27,7 @@ RUN     \
         set -eux \
 &&      apt-get update \
 &&      apt-get upgrade -y \
-&&      apt-get install -y --no-install-recommends vim tzdata bash curl ca-certificates procps iputils-ping telnet unzip \
+&&      apt-get install -y --no-install-recommends vim tzdata bash curl ca-certificates procps iputils-ping telnet unzip apt-utils \
 &&      echo 'alias ll="ls -lahs"' >> /home/vairogs/.bashrc \
 &&      echo 'alias ll="ls -lahs"' >> /root/.bashrc \
 &&      chown vairogs:vairogs /usr/local/bin/wait-for-it \
