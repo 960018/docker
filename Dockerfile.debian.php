@@ -8,21 +8,22 @@ USER    root
 
 ENV     PHP_VERSION 8.3.0-dev
 ENV     PHP_INI_DIR /usr/local/etc/php
-ENV     PHP_CFLAGS "-fstack-protector-strong -fpic -fpie -O2 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
+ENV     PHP_CFLAGS "-fstack-protector-strong -fpic -fpie -O2 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native"
 ENV     PHP_CPPFLAGS "$PHP_CFLAGS"
-ENV     PHP_LDFLAGS "-Wl,-O1 -pie"
+ENV     PHP_LDFLAGS "-Wl,-O2 -pie"
 
 COPY    php/no-debian-php /etc/apt/preferences.d/no-debian-php
-COPY    php/ping.sh /usr/local/bin/php-fpm-ping
-COPY    php/src/ /usr/src/php
-COPY    php/installer /home/vairogs/installer
-COPY    php/docker-php-entrypoint /usr/local/bin/docker-php-entrypoint
-COPY    php/docker-php-ext-configure /usr/local/bin/docker-php-ext-configure
-COPY    php/docker-php-ext-enable /usr/local/bin/docker-php-ext-enable
-COPY    php/docker-php-ext-install /usr/local/bin/docker-php-ext-install
-COPY    php/docker-php-source /usr/local/bin/docker-php-source
+COPY    php/ping.sh       /usr/local/bin/php-fpm-ping
+COPY    php/src/          /usr/src/php
+COPY    php/installer     /home/vairogs/installer
+COPY    php/redis/        /home/vairogs/
 
-COPY    php/redis/ /home/vairogs/
+COPY    php/docker-php-entrypoint    /usr/local/bin/docker-php-entrypoint
+COPY    php/docker-php-ext-configure /usr/local/bin/docker-php-ext-configure
+COPY    php/docker-php-ext-enable    /usr/local/bin/docker-php-ext-enable
+COPY    php/docker-php-ext-install   /usr/local/bin/docker-php-ext-install
+COPY    php/docker-php-source        /usr/local/bin/docker-php-source
+
 COPY    --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
 ENTRYPOINT ["docker-php-entrypoint"]
@@ -229,6 +230,7 @@ ENV     PHP_CPPFLAGS "$PHP_CFLAGS"
 ENV     PHP_LDFLAGS "-Wl,-O1 -pie"
 ENV     container=docker
 ENV     DEBIAN_FRONTEND=noninteractive
+ENV     PHP_CS_FIXER_IGNORE_ENV 1
 
 STOPSIGNAL SIGQUIT
 

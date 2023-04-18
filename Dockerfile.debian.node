@@ -5,10 +5,10 @@ ENV     DEBIAN_FRONTEND=noninteractive
 
 SHELL   ["/bin/bash", "-o", "pipefail", "-c"]
 
-COPY    global/01_nodoc /etc/dpkg/dpkg.cfg.d/01_nodoc
+COPY    global/01_nodoc  /etc/dpkg/dpkg.cfg.d/01_nodoc
 COPY    global/02nocache /etc/apt/apt.conf.d/02nocache
-COPY    global/compress /etc/initramfs-tools/conf.d/compress
-COPY    global/modules /etc/initramfs-tools/conf.d/modules
+COPY    global/compress  /etc/initramfs-tools/conf.d/compress
+COPY    global/modules   /etc/initramfs-tools/conf.d/modules
 
 USER    root
 
