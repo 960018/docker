@@ -5,7 +5,7 @@ curl/src/
 pg/
 postgres13/
 postgres15/
-traefik/
+traefik/log/
 php/src/
 php/source/
 php/clone/*

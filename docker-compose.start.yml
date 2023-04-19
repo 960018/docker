@@ -24,8 +24,8 @@ services:
             - backend
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
-            - ./traefik:/etc/traefik
-            - ./dynamic_conf:/dynamic_conf
+            - ./traefik/log:/etc/traefik/log
+            - ./traefik/dynamic_conf:/dynamic_conf
         restart: always
         command:
             - --log
