@@ -4,6 +4,7 @@ curl/source/
 curl/src/
 pg/
 postgres13/
+postgres14/
 postgres15/
 traefik/log/
 php/src/
