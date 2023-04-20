@@ -71,4 +71,4 @@ USER    vairogs
 
 EXPOSE  6379
 
-CMD ["keydb-server" "/etc/keydb/keydb.conf"]
+CMD     ["keydb-server" "/etc/keydb/keydb.conf"]

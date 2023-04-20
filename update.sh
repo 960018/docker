@@ -1,57 +1,57 @@
 #!/usr/bin/env bash
 
-cd curl
+cd curl || exit
 rm -rf src msrc
-cd source
+cd source || exit
 git reset --hard; 
 git pull; 
 git submodule update --init --force;
-cd ..
-cd msh3
+cd .. || exit
+cd msh3 || exit
 git reset --hard; 
 git pull; 
 git submodule update --init --force;
-cd ..
+cd .. || exit
 cp -r source src
-cd src
+cd src || exit
 rm -rf .git/ .github/
-cd ..
+cd .. || exit
 cp -r msh3 msrc
-cd msrc
+cd msrc || exit
 rm -rf .git/ .github/
-cd ..
-cd ..
+cd .. || exit
+cd .. || exit
 
-cd php
+cd php || exit
 rm -rf src
-cd source
+cd source || exit
 git reset --hard; 
 git pull; 
 git submodule update --init --force;
-cd ..
+cd .. || exit
 cp -r source src
-cd src
+cd src || exit
 rm -rf .git/ .github/
-cd ..
-cd clone
+cd .. || exit
+cd clone || exit
 
 exts=("phpredis" "phpiredis" "runkit7" "xdebug")
 
 for i in "${exts[@]}"
 do
-    cd "$i"
+    cd "$i" || exit
     git reset --hard; 
     git pull; 
     git submodule update --init --force;
-    cd ..
+    cd .. || exit
     rm -rf "${i}src"
     cp -r "$i" "${i}src"
-    cd "${i}src"
+    cd "${i}src" || exit
     rm -rf .git/ .github/
-    cd ..
+    cd .. || exit
 done
 
-cd ..
+cd .. || exit
 
 docker pull mlocati/php-extension-installer
 docker pull eqalpha/keydb:latest

@@ -95,7 +95,7 @@ RUN     \
             --with-pdo-sqlite=/usr \
             --with-readline \
             --with-sodium=shared \
-    		--with-sqlite3=/usr \
+            --with-sqlite3=/usr \
             --with-tidy \
             --with-zlib \
 &&      make -j "$(expr $(nproc) / 3)" \
