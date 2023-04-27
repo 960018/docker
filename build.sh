@@ -22,7 +22,7 @@ esac
 
 export ARCH
 
-docker login ghcr.io -u $CR_USER --password $CR_PAT
+docker login ghcr.io -u "$CR_USER" --password "$CR_PAT"
 
 docker buildx build --tag ghcr.io/960018/curl:$ARCH --push --compress --no-cache --sbom=false --provenance=false -f Dockerfile.debian.curl . || exit
 docker buildx build --tag ghcr.io/960018/nginx:$ARCH --push --compress --no-cache --sbom=false --provenance=false -f Dockerfile.debian.nginx . || exit

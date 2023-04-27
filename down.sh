@@ -19,6 +19,6 @@ esac
 
 export ARCH
 
-docker login ghcr.io -u $CR_USER --password $CR_PAT
+docker login ghcr.io -u "$CR_USER" --password "$CR_PAT"
 
 docker compose -f docker-compose.start.yml down
