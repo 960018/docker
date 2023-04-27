@@ -214,29 +214,20 @@ USER    vairogs
 
 CMD     ["sh", "-c", "php-fpm && /bin/bash"]
 
-FROM    scratch
+FROM    ghcr.io/960018/scratch:latest
 
-COPY    --from=builder / / 
-
-SHELL   ["/bin/bash", "-o", "pipefail", "-c"]
-
-LABEL   maintainer="support+docker@vairogs.com"
-LABEL   org.opencontainers.image.source https://github.com/960018/docker
+COPY    --from=builder / /
 
 ENV     PHP_VERSION 8.3.0-dev
 ENV     PHP_INI_DIR /usr/local/etc/php
 ENV     PHP_CFLAGS "-fstack-protector-strong -fpic -fpie -O2 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native"
 ENV     PHP_CPPFLAGS "$PHP_CFLAGS"
 ENV     PHP_LDFLAGS "-Wl,-O2 -pie"
-ENV     container=docker
-ENV     DEBIAN_FRONTEND=noninteractive
 ENV     PHP_CS_FIXER_IGNORE_ENV 1
 
 STOPSIGNAL SIGQUIT
 
 WORKDIR /var/www/html
-
-USER    vairogs
 
 EXPOSE  9000
 

@@ -47,20 +47,13 @@ RUN     \
 
 USER    vairogs
 
-FROM    scratch
+FROM    ghcr.io/960018/scratch:latest
 
-COPY    --from=builder / / 
+COPY    --from=builder / /
 
-LABEL   maintainer="support+docker@vairogs.com"
-LABEL   org.opencontainers.image.source https://github.com/960018/docker
+ARG     NV=${1:-"20.0.0"}
 
-ENV     container=docker
-ENV     DEBIAN_FRONTEND=noninteractive
-ENV     NODE_VERSION=19.8.1
+ENV     NODE_VERSION=${NV}
 ENV     YARN_VERSION=1.22.19
-
-SHELL   ["/bin/bash", "-o", "pipefail", "-c"]
-
-USER    vairogs
 
 CMD     ["node"]
