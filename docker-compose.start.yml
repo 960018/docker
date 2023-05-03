@@ -68,7 +68,7 @@ services:
             - traefik.http.routers.ping.rule=Host(`localhost`) && PathPrefix(`/ping`)
             - traefik.http.routers.ping.service=ping@internal
         healthcheck:
-            test: wget --spider https://localhost/ping --no-check-certificate || exit 1
+            test: wget --no-check-certificate -q -O - http://localhost:443/ping || exit 1
             interval: 30s
             timeout: 30s
             retries: 3
