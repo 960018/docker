@@ -132,8 +132,6 @@ COPY    php/clone/phpiredissrc/ /home/vairogs/extensions/phpiredis/
 
 WORKDIR /home/vairogs/extensions
 
-ARG     RELAY
-
 RUN     \
         set -eux \
 &&      ( \
@@ -154,10 +152,6 @@ RUN     \
             &&  cd .. || exit \
         ) \
 &&      docker-php-ext-enable phpiredis \
-&&      curl -L "https://builds.r2.relay.so/dev/relay-dev-php8.3-debian-$RELAY+libssl3.tar.gz" | tar xz -C /tmp \
-&&      cp "/tmp/relay-dev-php8.3-debian-$RELAY+libssl3/relay-pkg.so" $(php-config --extension-dir)/relay.so \
-&&      sed -i "s/00000000-0000-0000-0000-000000000000/$(cat /proc/sys/kernel/random/uuid)/" $(php-config --extension-dir)/relay.so \
-&&      chmod 755 $(php-config --extension-dir)/relay.so \
 &&      touch /var/www/html/config/preload.php \
 &&      apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false build-essential autoconf dpkg-dev re2c bison libxml2-dev libssl-dev libsqlite3-dev xz-utils libargon2-dev libgcc-12-dev \
         libnghttp3-dev libonig-dev libreadline-dev libsodium-dev zlib1g-dev libbz2-dev libgmp-dev libedit-dev libtidy-dev libnghttp2-dev librtmp-dev libgsasl-dev libpsl-dev libzstd-dev libcrypt-dev \
@@ -198,7 +192,6 @@ COPY    php/php-fpm.conf /usr/local/etc/php-fpm.conf
 COPY    php/www.conf /usr/local/etc/php-fpm.d/www.conf
 COPY    php/php.ini-development /usr/local/etc/php/php.ini
 COPY    php/exts/opcache.ini /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
-COPY    php/exts/relay.ini /usr/local/etc/php/conf.d/docker-php-ext-relay.ini
 
 RUN     \
         set -eux \
