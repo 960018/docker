@@ -25,7 +25,6 @@ source .env
 
 docker pull "traefik:$TRAEFIK"
 docker pull "ghcr.io/960018/keydb:$ARCH"
-docker pull "gotenberg/gotenberg:$GOTENBERG"
 docker pull "postgres:$POSTGRES13"
 docker pull "postgres:$POSTGRES14"
 docker pull "postgres:$POSTGRES15"

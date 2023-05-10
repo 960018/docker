@@ -84,20 +84,8 @@ services:
             - ./keydb/keydb.conf:/etc/keydb/keydb.conf
             - redisdata:/data
         ports:
-            - 127.0.0.1:6379:6379 
-        command: keydb-server /etc/keydb/keydb.conf --requirepass Bqox56ewGRxrUY5MzFUNx0w23AXN0MY9 
-        mem_limit: 64M
-
-    gotenberg:
-        container_name: gotenberg
-        image: gotenberg/gotenberg:${GOTENBERG}
-        command:
-            - "gotenberg"
-            - "--chromium-ignore-certificate-errors=true"
-            - "--chromium-allow-insecure-localhost=true"
-        restart: always
-        networks:
-            - backend
+            - 127.0.0.1:6379:6379
+        command: keydb-server /etc/keydb/keydb.conf
         mem_limit: 64M
 
     postgres13:
