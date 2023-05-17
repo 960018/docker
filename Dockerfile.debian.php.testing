@@ -33,7 +33,7 @@ RUN     \
             &&  phpize \
             &&  autoupdate \
             &&  ./configure --enable-xdebug \
-            &&  make -j "$(expr $(nproc) / 3)" \
+            &&  make \
             &&  make install \
             &&  cd .. || exit \
         ) \
@@ -42,7 +42,7 @@ RUN     \
 #             cd  runkit7 \
 #             &&  phpize \
 #             &&  ./configure \
-#             &&  make -j "$(expr $(nproc) / 3)" \
+#             &&  make \
 #             &&  make install \
 #             &&  cd .. || exit \
 #         ) \

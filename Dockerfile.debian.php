@@ -98,7 +98,7 @@ RUN     \
             --with-sqlite3=/usr \
             --with-tidy \
             --with-zlib \
-&&      make -j "$(expr $(nproc) / 3)" \
+&&      make \
 &&      find -type f -name '*.a' -delete \
 &&      make install \
 &&      find /usr/local -type f -perm '/0111' -exec sh -euxc ' strip --strip-all "$@" || : ' -- '{}' + \
@@ -137,7 +137,7 @@ RUN     \
             cd  phpredis \
             &&  phpize \
             &&  ./configure --enable-redis-igbinary --enable-redis-zstd --enable-redis-msgpack --enable-redis-lzf --with-liblzf --enable-redis-lz4 --with-liblz4 \
-            &&  make -j "$(expr $(nproc) / 3)" \
+            &&  make \
             &&  make install \
             &&  cd .. || exit \
         ) \
@@ -146,7 +146,7 @@ RUN     \
             cd  phpiredis \
             &&  phpize \
             &&  ./configure --enable-phpiredis \
-            &&  make -j "$(expr $(nproc) / 3)" \
+            &&  make \
             &&  make install \
             &&  cd .. || exit \
         ) \

@@ -55,7 +55,7 @@ RUN     \
 &&      cd curl \
 &&      autoreconf -fi \
 &&      ./configure LDFLAGS="-Wl,-rpath,/usr/local/lib" --with-openssl --with-zlib --with-brotli --with-gssapi --enable-ipv6 --with-libidn2 --enable-sspi --with-librtmp --with-nghttp2 --with-msh3=/usr/local --enable-websockets --with-zstd --with-psl \
-&&      make -j "$(expr $(nproc) / 3)" \
+&&      make \
 &&      make install \
 &&      apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false libbrotli-dev git cmake make automake autoconf libtool gcc g++ libzstd-dev libssl-dev librtmp-dev krb5-multidev libcrypt-dev libnsl-dev libtirpc-dev linux-libc-dev comerr-dev perl libnghttp3-dev libnghttp2-dev libgsasl-dev libgssglue-dev libidn-dev libidn11-dev libntlm0-dev libpsl-dev \
 &&      apt autoremove -y \
