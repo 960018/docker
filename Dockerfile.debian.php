@@ -15,7 +15,6 @@ ENV     PHP_LDFLAGS "-Wl,-O2 -pie"
 COPY    php/no-debian-php /etc/apt/preferences.d/no-debian-php
 COPY    php/ping.sh       /usr/local/bin/php-fpm-ping
 COPY    php/src/          /usr/src/php
-COPY    php/installer     /home/vairogs/installer
 COPY    php/redis/        /home/vairogs/
 
 COPY    php/docker-php-entrypoint    /usr/local/bin/docker-php-entrypoint
@@ -24,7 +23,8 @@ COPY    php/docker-php-ext-enable    /usr/local/bin/docker-php-ext-enable
 COPY    php/docker-php-ext-install   /usr/local/bin/docker-php-ext-install
 COPY    php/docker-php-source        /usr/local/bin/docker-php-source
 
-COPY    --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+COPY    --from=mlocati/php-extension-installer:latest /usr/bin/install-php-extensions /usr/local/bin/
+COPY    --from=composer:latest                        /usr/bin/composer /usr/bin/
 
 ENTRYPOINT ["docker-php-entrypoint"]
 
@@ -117,7 +117,6 @@ RUN     \
 &&      mkdir --parents --mode=777 --verbose /run/php-fpm \
 &&      mkdir --parents /var/www/html/config \
 &&      touch /run/php-fpm/.keep_dir \
-&&      cat /home/vairogs/installer | php -- --install-dir=/usr/local/bin --filename=composer \
 &&      composer self-update --snapshot \
 &&      export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" \
 &&      docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ --with-webp=/usr/include/ \
@@ -160,7 +159,6 @@ RUN     \
 &&      apt-get autoremove -y --purge \
 &&      rm -rf \
             ~/.pearrc \
-            /home/vairogs/installer \
             /home/vairogs/extensions \
             /home/vairogs/*.deb \
             /home/vairogs/*.gz \
