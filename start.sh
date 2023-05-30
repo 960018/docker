@@ -19,14 +19,14 @@ esac
 
 export ARCH
 
-docker login ghcr.io -u "$CR_USER" --password "$CR_PAT"
+docker login ghcr.io -u "$CR_USER" --password "$CR_PAT" || exit
 
 source .env
 
-docker pull "traefik:$TRAEFIK"
-docker pull "ghcr.io/960018/keydb:$ARCH"
-docker pull "postgres:$POSTGRES13"
-docker pull "postgres:$POSTGRES14"
-docker pull "postgres:$POSTGRES15"
+docker pull "traefik:$TRAEFIK" || exit
+docker pull "ghcr.io/960018/keydb:$ARCH" || exit
+docker pull "postgres:$POSTGRES13" || exit
+docker pull "postgres:$POSTGRES14" || exit
+docker pull "postgres:$POSTGRES15" || exit
 
-docker compose -f docker-compose.start.yml up -d --force-recreate
+docker compose -f docker-compose.start.yml up -d --force-recreate || exit
