@@ -133,3 +133,18 @@ services:
             - 127.0.0.1:5435:5432
         mem_limit: 256M
 
+    postgres16:
+        image: postgres:${POSTGRES16}
+        container_name: postgres16
+        environment:
+            POSTGRES_PASSWORD: 'Bqox56ewGRxrUY5MzFUNx0w23AXN0MY9'
+        volumes:
+            - ./postgres16:/var/lib/postgresql
+            - ./pg:/data
+        restart: always
+        networks:
+            - backend
+        ports:
+            - 127.0.0.1:5436:5432
+        mem_limit: 256M
+

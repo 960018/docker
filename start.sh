@@ -25,5 +25,6 @@ docker pull "ghcr.io/960018/keydb:$ARCH" || exit
 docker pull "postgres:$POSTGRES13" || exit
 docker pull "postgres:$POSTGRES14" || exit
 docker pull "postgres:$POSTGRES15" || exit
+docker pull "postgres:$POSTGRES16" || exit
 
 docker compose -f docker-compose.start.yml up -d --force-recreate || exit

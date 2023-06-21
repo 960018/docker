@@ -57,5 +57,5 @@ docker pull mlocati/php-extension-installer:latest
 docker pull composer:latest
 docker pull eqalpha/keydb:latest
 docker pull debian:sid-slim
-docker pull nginx:1.24-bullseye
-docker pull node:20-bullseye-slim
+docker pull nginx:1.25-bookworm
+docker pull node:20-bookworm-slim
