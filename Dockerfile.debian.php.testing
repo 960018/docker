@@ -27,7 +27,10 @@ RUN     \
         set -eux \
 &&      apt-get update \
 &&      apt-get upgrade -y \
-&&      apt-get install -y --no-install-recommends autoconf dpkg-dev dpkg file g++ gcc libc-dev make pkgconf re2c bison \
+&&      apt-get install -y --no-install-recommends autoconf dpkg-dev dpkg file make libc-dev libc6-dev gcc-11 g++-11 cpp pkgconf re2c bison \
+&&      ln -s /usr/bin/gcc-11 /usr/bin/gcc \
+&&      ln -s /usr/bin/g++-11 /usr/bin/g++ \
+&&      ln -s /usr/bin/g++-11 /usr/bin/cpp \
 &&      ( \
             cd xdebug \
             &&  phpize \
@@ -56,7 +59,7 @@ RUN     \
 &&      echo 'alias ins="composer install -n --ignore-platform-reqs"' >> /home/vairogs/.bashrc \
 &&      echo 'alias req="composer require -nW --ignore-platform-reqs"' >> /home/vairogs/.bashrc \
 &&      echo 'alias rem="composer remove -nW --ignore-platform-reqs"' >> /home/vairogs/.bashrc \
-&&      apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false autoconf dpkg-dev g++ gcc file libc-dev make pkgconf re2c bison \
+&&      apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false autoconf dpkg-dev make libc-dev libc6-dev gcc-11 g++-11 file pkgconf re2c bison \
 &&      apt-get autoremove -y --purge \
 &&      rm -rf \
             /*.deb \
@@ -77,6 +80,9 @@ RUN     \
             /tmp/* \
             /usr/share/vim/vim90/doc \
             /usr/share/man/* \
+            /usr/bin/gcc \
+            /usr/bin/g++ \
+            /usr/bin/cpp \
 &&      chown -R vairogs:vairogs /home/vairogs
 
 COPY    php/exts/opcache.jit.ini /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini

@@ -8,7 +8,7 @@ USER    root
 
 ENV     PHP_VERSION 8.3.0-dev
 ENV     PHP_INI_DIR /usr/local/etc/php
-ENV     PHP_CFLAGS "-fstack-protector-strong -fpic -fpie -O2 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native"
+ENV     PHP_CFLAGS "-fstack-protector-strong -fpic -fpie -O2 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native -mcpu=native"
 ENV     PHP_CPPFLAGS "$PHP_CFLAGS"
 ENV     PHP_LDFLAGS "-Wl,-O2 -pie"
 
@@ -36,10 +36,13 @@ RUN     \
         set -eux \
 &&      apt-get update \
 &&      apt-get upgrade -y \
-&&      apt-get install -y --no-install-recommends build-essential bison git autoconf dpkg-dev dpkg re2c libxml2-dev libxml2 libssl-dev libssl3 libsqlite3-dev libsqlite3-0 xz-utils libargon2-dev libargon2-1 \
+&&      apt-get install -y --no-install-recommends make libc-dev libc6-dev gcc-11 g++-11 cpp-11 bison git autoconf dpkg-dev dpkg re2c libxml2-dev libxml2 libssl-dev libssl3 libsqlite3-dev libsqlite3-0 xz-utils libargon2-dev libargon2-1 \
         libonig-dev libonig5 libreadline-dev libreadline8 libsodium-dev libsodium23 zlib1g-dev zlib1g libbz2-dev libbz2-1.0 libgmp-dev libgmp10 libedit-dev libedit2 libtidy-dev libtidy5deb1 libnghttp3-dev libnghttp3-3 \
         libnghttp2-dev nghttp2 idn2 libidn2-0 librtmp-dev librtmp1 rtmpdump libgsasl-dev libgsasl18 libpsl-dev libpsl5 zstd libzstd-dev libbrotli1 libbrotli-dev libjpeg62-turbo libjpeg62-turbo-dev libpng16-16 libpng-dev \
         libwebp7 libwebp-dev libfreetype-dev libfreetype6 liblzf-dev liblzf1 liblzf-dev liblzf1 liblz4-dev liblzf-dev liblz4-1 gdb-minimal \
+&&      ln -s /usr/bin/gcc-11 /usr/bin/gcc \
+&&      ln -s /usr/bin/g++-11 /usr/bin/g++ \
+&&      ln -s /usr/bin/cpp-11 /usr/bin/cpp \
 &&      dpkg -i /home/vairogs/libhiredis-$OS.deb \
 &&      dpkg -i /home/vairogs/libhiredis-dev-$OS.deb \
 &&      chmod -R 777 /usr/local/bin \
@@ -117,7 +120,10 @@ RUN     \
 &&      mkdir --parents --mode=777 --verbose /run/php-fpm \
 &&      mkdir --parents /var/www/html/config \
 &&      touch /run/php-fpm/.keep_dir \
-&&      composer self-update --snapshot \
+&&      composer self-update --snapshot
+
+RUN     \
+        set -eux \
 &&      export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" \
 &&      docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ --with-webp=/usr/include/ \
 &&      docker-php-ext-install gd \
@@ -151,11 +157,10 @@ RUN     \
             &&  cd .. || exit \
         ) \
 &&      docker-php-ext-enable phpiredis \
-&&      touch /var/www/html/config/preload.php \
-&&      apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false build-essential autoconf dpkg-dev re2c bison libxml2-dev libssl-dev libsqlite3-dev xz-utils libargon2-dev libgcc-12-dev \
+&&      apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false make libc-dev libc6-dev gcc-11 g++-11 autoconf dpkg-dev re2c bison libxml2-dev libssl-dev libsqlite3-dev xz-utils libargon2-dev libgcc-11-dev \
         libnghttp3-dev libonig-dev libreadline-dev libsodium-dev zlib1g-dev libbz2-dev libgmp-dev libedit-dev libtidy-dev libnghttp2-dev librtmp-dev libgsasl-dev libpsl-dev libzstd-dev libcrypt-dev \
         libbrotli-dev libjpeg62-turbo-dev libpng-dev libwebp-dev libfreetype-dev liblz4-dev liblzf-dev pkgconf make icu-devtools libbsd-dev libc-dev-bin libc6-dev libgssglue-dev libhiredis-dev libicu-dev \
-        libidn-dev libidn11-dev libidn2-dev libmd-dev libncurses-dev libnsl-dev libntlm0-dev libp11-kit-dev libstdc++-12-dev libtasn1-6-dev libtirpc-dev linux-libc-dev g++ gcc \
+        libidn-dev libidn11-dev libidn2-dev libmd-dev libncurses-dev libnsl-dev libntlm0-dev libp11-kit-dev libstdc++-11-dev libtasn1-6-dev libtirpc-dev linux-libc-dev \
 &&      apt-get autoremove -y --purge \
 &&      rm -rf \
             ~/.pearrc \
@@ -181,6 +186,9 @@ RUN     \
             /usr/share/vim/vim90/doc \
             /usr/local/bin/install-php-extensions \
             /usr/share/man/* \
+            /usr/bin/gcc \
+            /usr/bin/g++ \
+            /usr/bin/cpp \
 &&      mkdir --parents /var/lib/php/sessions \
 &&      chown -R vairogs:vairogs /var/lib/php/sessions \
 &&      mkdir --parents /var/lib/php/opcache \
@@ -190,6 +198,7 @@ COPY    php/php-fpm.conf /usr/local/etc/php-fpm.conf
 COPY    php/www.conf /usr/local/etc/php-fpm.d/www.conf
 COPY    php/php.ini-development /usr/local/etc/php/php.ini
 COPY    php/exts/opcache.ini /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
+COPY    php/preload.php /var/www/preload.php
 
 RUN     \
         set -eux \
