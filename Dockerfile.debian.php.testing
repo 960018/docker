@@ -6,8 +6,9 @@ ARG     OS
 
 USER    root
 
+ENV     PHP_VERSION 8.3.0-dev
 ENV     PHP_INI_DIR /usr/local/etc/php
-ENV     PHP_CFLAGS "-fstack-protector-strong -fpic -fpie -O2 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native"
+ENV     PHP_CFLAGS "-fstack-protector-strong -fpic -fpie -O2 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native -mcpu=native"
 ENV     PHP_CPPFLAGS "$PHP_CFLAGS"
 ENV     PHP_LDFLAGS "-Wl,-O2 -pie"
 
@@ -27,10 +28,10 @@ RUN     \
         set -eux \
 &&      apt-get update \
 &&      apt-get upgrade -y \
-&&      apt-get install -y --no-install-recommends autoconf dpkg-dev dpkg file make libc-dev libc6-dev gcc-11 g++-11 cpp pkgconf re2c bison \
-&&      ln -s /usr/bin/gcc-11 /usr/bin/gcc \
-&&      ln -s /usr/bin/g++-11 /usr/bin/g++ \
-&&      ln -s /usr/bin/g++-11 /usr/bin/cpp \
+&&      apt-get install -y --no-install-recommends autoconf dpkg-dev dpkg file make libc-dev libc6-dev cpp gcc g++ pkgconf re2c bison \
+#&&      ln -sf /usr/bin/gcc-11 /usr/bin/gcc \
+#&&      ln -sf /usr/bin/g++-11 /usr/bin/g++ \
+#&&      ln -sf /usr/bin/g++-11 /usr/bin/cpp \
 &&      ( \
             cd xdebug \
             &&  phpize \
@@ -59,7 +60,8 @@ RUN     \
 &&      echo 'alias ins="composer install -n --ignore-platform-reqs"' >> /home/vairogs/.bashrc \
 &&      echo 'alias req="composer require -nW --ignore-platform-reqs"' >> /home/vairogs/.bashrc \
 &&      echo 'alias rem="composer remove -nW --ignore-platform-reqs"' >> /home/vairogs/.bashrc \
-&&      apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false autoconf dpkg-dev make libc-dev libc6-dev gcc-11 g++-11 file pkgconf re2c bison \
+&&      apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false autoconf dpkg-dev make libc-dev libc6-dev file \
+        pkgconf re2c bison cpp gcc g++ gcc-13 cpp-13 fontconfig \
 &&      apt-get autoremove -y --purge \
 &&      rm -rf \
             /*.deb \
@@ -83,7 +85,8 @@ RUN     \
             /usr/bin/gcc \
             /usr/bin/g++ \
             /usr/bin/cpp \
-&&      chown -R vairogs:vairogs /home/vairogs
+&&      chown -R vairogs:vairogs /home/vairogs \
+&&      git config --global --add safe.directory "*"
 
 COPY    php/exts/opcache.jit.ini /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
 
@@ -99,7 +102,7 @@ COPY    --from=builder / /
 
 ENV     PHP_VERSION 8.3.0-dev
 ENV     PHP_INI_DIR /usr/local/etc/php
-ENV     PHP_CFLAGS "-fstack-protector-strong -fpic -fpie -O2 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native"
+ENV     PHP_CFLAGS "-fstack-protector-strong -fpic -fpie -O2 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native -mcpu=native"
 ENV     PHP_CPPFLAGS "$PHP_CFLAGS"
 ENV     PHP_LDFLAGS "-Wl,-O2 -pie"
 ENV     PHP_CS_FIXER_IGNORE_ENV 1

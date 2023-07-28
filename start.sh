@@ -27,4 +27,12 @@ docker pull "postgres:$POSTGRES14" || exit
 docker pull "postgres:$POSTGRES15" || exit
 docker pull "postgres:$POSTGRES16" || exit
 
+if [ -z $(docker network ls --filter name=^frontend$ --format="{{ .Name }}") ]; then
+    docker network create frontend;
+fi
+
+if [ -z $(docker network ls --filter name=^backend$ --format="{{ .Name }}") ]; then
+    docker network create backend;
+fi
+
 docker compose -f docker-compose.start.yml up -d --force-recreate || exit

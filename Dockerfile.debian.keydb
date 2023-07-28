@@ -1,6 +1,4 @@
-ARG     VERSION=latest
-
-FROM    eqalpha/keydb:$VERSION as builder
+FROM    eqalpha/keydb:latest as builder
 
 ENV     container=docker
 ENV     DEBIAN_FRONTEND=noninteractive

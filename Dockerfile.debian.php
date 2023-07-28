@@ -13,7 +13,6 @@ ENV     PHP_CPPFLAGS "$PHP_CFLAGS"
 ENV     PHP_LDFLAGS "-Wl,-O2 -pie"
 
 COPY    php/no-debian-php /etc/apt/preferences.d/no-debian-php
-COPY    php/ping.sh       /usr/local/bin/php-fpm-ping
 COPY    php/src/          /usr/src/php
 COPY    php/redis/        /home/vairogs/
 
@@ -36,13 +35,10 @@ RUN     \
         set -eux \
 &&      apt-get update \
 &&      apt-get upgrade -y \
-&&      apt-get install -y --no-install-recommends make libc-dev libc6-dev gcc-11 g++-11 cpp-11 bison git autoconf dpkg-dev dpkg re2c libxml2-dev libxml2 libssl-dev libssl3 libsqlite3-dev libsqlite3-0 xz-utils libargon2-dev libargon2-1 \
+&&      apt-get install -y --no-install-recommends make libc-dev libc6-dev gcc g++ cpp bison git autoconf dpkg-dev dpkg re2c libxml2-dev libxml2 libssl-dev libssl3 libsqlite3-dev libsqlite3-0 xz-utils libargon2-dev libargon2-1 \
         libonig-dev libonig5 libreadline-dev libreadline8 libsodium-dev libsodium23 zlib1g-dev zlib1g libbz2-dev libbz2-1.0 libgmp-dev libgmp10 libedit-dev libedit2 libtidy-dev libtidy5deb1 libnghttp3-dev libnghttp3-3 \
         libnghttp2-dev nghttp2 idn2 libidn2-0 librtmp-dev librtmp1 rtmpdump libgsasl-dev libgsasl18 libpsl-dev libpsl5 zstd libzstd-dev libbrotli1 libbrotli-dev libjpeg62-turbo libjpeg62-turbo-dev libpng16-16 libpng-dev \
-        libwebp7 libwebp-dev libfreetype-dev libfreetype6 liblzf-dev liblzf1 liblzf-dev liblzf1 liblz4-dev liblzf-dev liblz4-1 gdb-minimal \
-&&      ln -s /usr/bin/gcc-11 /usr/bin/gcc \
-&&      ln -s /usr/bin/g++-11 /usr/bin/g++ \
-&&      ln -s /usr/bin/cpp-11 /usr/bin/cpp \
+        libwebp7 libwebp-dev libfreetype-dev libfreetype6 liblzf-dev liblzf1 liblzf-dev liblzf1 liblz4-dev liblzf-dev liblz4-1 gdb-minimal libfcgi-bin wget \
 &&      dpkg -i /home/vairogs/libhiredis-$OS.deb \
 &&      dpkg -i /home/vairogs/libhiredis-dev-$OS.deb \
 &&      chmod -R 777 /usr/local/bin \
@@ -132,6 +128,12 @@ RUN     \
 &&      install-php-extensions php-memcached-dev/php-memcached@master inotify msgpack lzf pdo_pgsql pgsql zip krakjoe/apcu@master igbinary/igbinary@master Imagick/imagick@develop event simdjson \
         ev lz4 yac yaml zstd
 
+RUN     \
+        set -eux \
+&&      wget -O /usr/local/bin/php-fpm-healthcheck https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/master/php-fpm-healthcheck \
+&&      chmod +x /usr/local/bin/php-fpm-healthcheck \
+&&      chown www-data:www-data /usr/local/bin/php-fpm-healthcheck
+
 COPY    php/clone/phpredissrc/ /home/vairogs/extensions/phpredis/
 COPY    php/clone/phpiredissrc/ /home/vairogs/extensions/phpiredis/
 
@@ -157,10 +159,10 @@ RUN     \
             &&  cd .. || exit \
         ) \
 &&      docker-php-ext-enable phpiredis \
-&&      apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false make libc-dev libc6-dev gcc-11 g++-11 autoconf dpkg-dev re2c bison libxml2-dev libssl-dev libsqlite3-dev xz-utils libargon2-dev libgcc-11-dev \
+&&      apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false make libc-dev libc6-dev cpp gcc g++ autoconf dpkg-dev re2c bison libxml2-dev libssl-dev libsqlite3-dev xz-utils libargon2-dev \
         libnghttp3-dev libonig-dev libreadline-dev libsodium-dev zlib1g-dev libbz2-dev libgmp-dev libedit-dev libtidy-dev libnghttp2-dev librtmp-dev libgsasl-dev libpsl-dev libzstd-dev libcrypt-dev \
         libbrotli-dev libjpeg62-turbo-dev libpng-dev libwebp-dev libfreetype-dev liblz4-dev liblzf-dev pkgconf make icu-devtools libbsd-dev libc-dev-bin libc6-dev libgssglue-dev libhiredis-dev libicu-dev \
-        libidn-dev libidn11-dev libidn2-dev libmd-dev libncurses-dev libnsl-dev libntlm0-dev libp11-kit-dev libstdc++-11-dev libtasn1-6-dev libtirpc-dev linux-libc-dev \
+        libidn-dev libidn11-dev libidn2-dev libmd-dev libncurses-dev libnsl-dev libntlm0-dev libp11-kit-dev libtasn1-6-dev libtirpc-dev linux-libc-dev cpp-13 gcc-13 fontconfig \
 &&      apt-get autoremove -y --purge \
 &&      rm -rf \
             ~/.pearrc \
@@ -220,7 +222,7 @@ COPY    --from=builder / /
 
 ENV     PHP_VERSION 8.3.0-dev
 ENV     PHP_INI_DIR /usr/local/etc/php
-ENV     PHP_CFLAGS "-fstack-protector-strong -fpic -fpie -O2 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native"
+ENV     PHP_CFLAGS "-fstack-protector-strong -fpic -fpie -O2 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native -mcpu=native"
 ENV     PHP_CPPFLAGS "$PHP_CFLAGS"
 ENV     PHP_LDFLAGS "-Wl,-O2 -pie"
 ENV     PHP_CS_FIXER_IGNORE_ENV 1

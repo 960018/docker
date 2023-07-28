@@ -1,1 +1,1 @@
-git clone --single-branch https://github.com/simpletoimplement/phpiredis.git
+git clone --single-branch https://github.com/960018/phpiredis.git

@@ -28,11 +28,12 @@ RUN     \
         set -eux \
 &&      apt-get update \
 &&      apt-get upgrade -y \
-&&      apt-get install -y --no-install-recommends vim tzdata bash curl ca-certificates procps iputils-ping telnet unzip apt-utils \
+&&      apt-get install -y --no-install-recommends vim-tiny tzdata bash curl ca-certificates procps iputils-ping telnet unzip apt-utils \
 &&      echo 'alias ll="ls -lahs"' >> /home/vairogs/.bashrc \
 &&      echo 'alias ll="ls -lahs"' >> /root/.bashrc \
 &&      chown vairogs:vairogs /usr/local/bin/wait-for-it \
-&&      chmod +x /usr/local/bin/wait-for-it
+&&      chmod +x /usr/local/bin/wait-for-it \
+&&      ln -sf /usr/bin/vi /usr/bin/vim
 
 WORKDIR /home/vairogs
 
@@ -58,7 +59,7 @@ RUN     \
 &&      make \
 &&      make install \
 &&      apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false libbrotli-dev git cmake make automake autoconf libtool gcc g++ libzstd-dev libssl-dev librtmp-dev krb5-multidev libcrypt-dev libnsl-dev libtirpc-dev linux-libc-dev comerr-dev perl libnghttp3-dev libnghttp2-dev libgsasl-dev libgssglue-dev libidn-dev libidn11-dev libntlm0-dev libpsl-dev \
-&&      apt autoremove -y \
+&&      apt-get autoremove -y --purge \
 &&      rm -rf \
             /home/vairogs/curl \
             /home/vairogs/msh3 \

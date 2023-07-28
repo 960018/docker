@@ -60,7 +60,8 @@ COPY    --from=builder / /
 STOPSIGNAL SIGQUIT
 
 EXPOSE  80
-EXPOSE  443
+EXPOSE 443/tcp
+EXPOSE 443/udp
 
 WORKDIR /var/www/html
 
