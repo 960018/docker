@@ -85,8 +85,7 @@ RUN     \
             /usr/bin/gcc \
             /usr/bin/g++ \
             /usr/bin/cpp \
-&&      chown -R vairogs:vairogs /home/vairogs \
-&&      git config --global --add safe.directory "*"
+&&      chown -R vairogs:vairogs /home/vairogs
 
 COPY    php/exts/opcache.jit.ini /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
 
@@ -112,5 +111,9 @@ STOPSIGNAL SIGQUIT
 WORKDIR /var/www/html
 
 EXPOSE  9000
+
+RUN     \
+        set -eux \
+&&      git config --global --add safe.directory "*"
 
 CMD     ["sh", "-c", "php-fpm && /bin/bash"]
