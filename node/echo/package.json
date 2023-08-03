@@ -1,0 +1,21 @@
+{
+    "name": "@k0d3r1s/echo",
+    "version": "2",
+    "description": "JSON service for debugging a web setup",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js"
+    },
+    "author": "k0d3r1s <k0d3r1s@vairogs.com>",
+    "license": "MIT",
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "dependencies": {
+        "concat-stream": "^2.0.0",
+        "express": "^4.17.1",
+        "jsonwebtoken": "^8.5.0",
+        "morgan": "^1.10.0"
+    },
+    "type": "module"
+}
