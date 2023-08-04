@@ -65,4 +65,5 @@ EXPOSE 443/udp
 
 WORKDIR /var/www/html
 
+ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD     ["nginx", "-g", "daemon off;"]

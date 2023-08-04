@@ -116,4 +116,5 @@ RUN     \
         set -eux \
 &&      git config --global --add safe.directory "*"
 
+ENTRYPOINT ["docker-php-entrypoint"]
 CMD     ["sh", "-c", "php-fpm && /bin/bash"]

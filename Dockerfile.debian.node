@@ -58,4 +58,5 @@ ARG     NV
 ENV     NODE_VERSION=${NV}
 ENV     YARN_VERSION=1.22.19
 
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD     ["node"]

@@ -233,4 +233,5 @@ WORKDIR /var/www/html
 
 EXPOSE  9000
 
+ENTRYPOINT ["docker-php-entrypoint"]
 CMD     ["sh", "-c", "php-fpm && /bin/bash"]
