@@ -11,11 +11,13 @@ function bool(mixed $value): bool
 
 if (bool($_ENV['ENABLE_PRELOAD'] ?? true)) {
     $prefix = '/var/www/html';
-    $dir = $_ENV['PRELOAD_DIR'] ?? (is_dir($short = $prefix . '/config') ? $short : (is_dir($long = $prefix . '/api/config') ? $long : null));
+    $path = '/var/cache/prod/';
+    $filename = 'App_KernelProdContainer.preload.php';
+    $dir = $_ENV['PRELOAD_DIR'] ?? (is_dir($short = $prefix . $path) ? $short : (is_dir($long = $prefix . '/api' . $path) ? $long : null));
 
     if (null !== $dir) {
-        if ('prod' === ($_ENV['APP_ENV'] ?? null) && file_exists($path = $dir . '/var/cache/prod/App_KernelProdContainer.preload.php')) {
-            opcache_compile_file($path);
+        if ('prod' === ($_ENV['APP_ENV'] ?? null) && file_exists($dir . $path)) {
+            opcache_compile_file($dir . $path);
         }
     }
 }
