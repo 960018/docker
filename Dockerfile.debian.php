@@ -16,11 +16,11 @@ COPY    php/no-debian-php /etc/apt/preferences.d/no-debian-php
 COPY    php/src/          /usr/src/php
 COPY    php/redis/        /home/vairogs/
 
-COPY    php/docker-php-entrypoint    /usr/local/bin/docker-php-entrypoint
-COPY    php/docker-php-ext-configure /usr/local/bin/docker-php-ext-configure
-COPY    php/docker-php-ext-enable    /usr/local/bin/docker-php-ext-enable
-COPY    php/docker-php-ext-install   /usr/local/bin/docker-php-ext-install
-COPY    php/docker-php-source        /usr/local/bin/docker-php-source
+COPY    php/docker/docker-php-entrypoint    /usr/local/bin/docker-php-entrypoint
+COPY    php/docker/docker-php-ext-configure /usr/local/bin/docker-php-ext-configure
+COPY    php/docker/docker-php-ext-enable    /usr/local/bin/docker-php-ext-enable
+COPY    php/docker/docker-php-ext-install   /usr/local/bin/docker-php-ext-install
+COPY    php/docker/docker-php-source        /usr/local/bin/docker-php-source
 
 COPY    --from=mlocati/php-extension-installer:latest /usr/bin/install-php-extensions /usr/local/bin/
 COPY    --from=composer:latest                        /usr/bin/composer /usr/bin/

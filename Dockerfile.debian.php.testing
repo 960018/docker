@@ -12,7 +12,7 @@ ENV     PHP_CFLAGS "-fstack-protector-strong -fpic -fpie -O2 -ftree-vectorize -D
 ENV     PHP_CPPFLAGS "$PHP_CFLAGS"
 ENV     PHP_LDFLAGS "-Wl,-O2 -pie"
 
-COPY    php/docker-php-ext-enable /usr/local/bin/docker-php-ext-enable
+COPY    php/docker/docker-php-ext-enable /usr/local/bin/docker-php-ext-enable
 
 COPY    php/clone/xdebugsrc/   /home/vairogs/extensions/xdebug/
 #COPY    php/clone/runkit7src/ /home/vairogs/extensions/runkit7/
