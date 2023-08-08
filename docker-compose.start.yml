@@ -76,6 +76,7 @@ services:
             timeout: 30s
             retries: 3
         mem_limit: 256M
+        profiles: ["full"]
 
     keydb:
         image: ghcr.io/960018/keydb:${ARCH}
@@ -90,6 +91,7 @@ services:
             - 127.0.0.1:6379:6379
         command: keydb-server /etc/keydb/keydb.conf
         mem_limit: 64M
+        profiles: ["full", "local"]
 
     postgres13:
         image: postgres:${POSTGRES13}
@@ -105,6 +107,7 @@ services:
         ports:
             - 127.0.0.1:5433:5432
         mem_limit: 256M
+        profiles: ["full", "local"]
 
     postgres14:
         image: postgres:${POSTGRES14}
@@ -120,6 +123,7 @@ services:
         ports:
             - 127.0.0.1:5434:5432
         mem_limit: 256M
+        profiles: ["full", "local"]
 
     postgres15:
         image: postgres:${POSTGRES15}
@@ -135,6 +139,7 @@ services:
         ports:
             - 127.0.0.1:5435:5432
         mem_limit: 256M
+        profiles: ["full", "local"]
 
     postgres16:
         image: postgres:${POSTGRES16}
@@ -150,3 +155,4 @@ services:
         ports:
             - 127.0.0.1:5436:5432
         mem_limit: 256M
+        profiles: ["full", "local"]

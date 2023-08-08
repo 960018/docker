@@ -35,4 +35,6 @@ if [ -z $(docker network ls --filter name=^backend$ --format="{{ .Name }}") ]; t
     docker network create backend;
 fi
 
-docker compose -f docker-compose.start.yml up -d --force-recreate || exit
+PROFILE=${1:-'full'}
+
+docker compose --profile $PROFILE -f docker-compose.start.yml up -d --force-recreate || exit
