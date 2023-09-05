@@ -60,3 +60,4 @@ docker pull debian:sid-slim
 docker pull nginx:1.25-bookworm
 docker pull node:20-bookworm-slim
 docker pull node:18-bookworm-slim
+docker pull oven/bun:canary
