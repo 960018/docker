@@ -214,7 +214,7 @@ WORKDIR /var/www/html
 
 USER    vairogs
 
-CMD     ["sh", "-c", "php-fpm && /bin/bash"]
+CMD     ["php-fpm"]
 
 FROM    ghcr.io/960018/scratch:latest
 
@@ -234,4 +234,4 @@ WORKDIR /var/www/html
 EXPOSE  9000
 
 ENTRYPOINT ["docker-php-entrypoint"]
-CMD     ["sh", "-c", "php-fpm && /bin/bash"]
+CMD     ["php-fpm"]

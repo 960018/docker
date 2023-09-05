@@ -1,5 +1,5 @@
 *
-!Dockerfile.debian.curl
+!curl.dockerfile
 !curl/src/
 !curl/msrc/
 !global/

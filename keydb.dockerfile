@@ -60,4 +60,4 @@ COPY    --from=builder / /
 EXPOSE  6379
 
 ENTRYPOINT ["docker-entrypoint.sh"]
-CMD     ["keydb-server" "/etc/keydb/keydb.conf"]
+CMD     ["keydb-server", "/etc/keydb/keydb.conf"]

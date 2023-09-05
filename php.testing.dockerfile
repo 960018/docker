@@ -29,9 +29,6 @@ RUN     \
 &&      apt-get update \
 &&      apt-get upgrade -y \
 &&      apt-get install -y --no-install-recommends autoconf dpkg-dev dpkg file make libc-dev libc6-dev cpp gcc g++ pkgconf re2c bison \
-#&&      ln -sf /usr/bin/gcc-11 /usr/bin/gcc \
-#&&      ln -sf /usr/bin/g++-11 /usr/bin/g++ \
-#&&      ln -sf /usr/bin/g++-11 /usr/bin/cpp \
 &&      ( \
             cd xdebug \
             &&  phpize \
@@ -93,7 +90,7 @@ WORKDIR /var/www/html
 
 USER    vairogs
 
-CMD     ["sh", "-c", "php-fpm && /bin/bash"]
+CMD     ["php-fpm"]
 
 FROM    ghcr.io/960018/scratch:latest
 
@@ -117,4 +114,4 @@ RUN     \
 &&      git config --global --add safe.directory "*"
 
 ENTRYPOINT ["docker-php-entrypoint"]
-CMD     ["sh", "-c", "php-fpm && /bin/bash"]
+CMD     ["php-fpm"]
