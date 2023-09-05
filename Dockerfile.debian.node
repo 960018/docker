@@ -45,7 +45,10 @@ RUN     \
             /usr/local/lib/node_modules/npm/html \
             /root/.npm \
             /root/.cache \
-&&      usermod -a -G dialout vairogs
+&&      usermod -a -G dialout vairogs \
+&&      npm i -g npm@next-10 \
+&&      npm i -g pnpm \
+&&      npm i -g bun@canary
 
 USER    vairogs
 
@@ -53,9 +56,9 @@ FROM    ghcr.io/960018/scratch:latest
 
 COPY    --from=builder / /
 
-ARG     NV
+ARG     VERSION
 
-ENV     NODE_VERSION=${NV}
+ENV     NODE_VERSION=${VERSION}
 ENV     YARN_VERSION=1.22.19
 
 ENTRYPOINT ["docker-entrypoint.sh"]
