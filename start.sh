@@ -37,4 +37,5 @@ fi
 
 PROFILE=${1:-'full'}
 
+docker compose --profile full -f docker-compose.start.yml down
 docker compose --profile $PROFILE -f docker-compose.start.yml up -d --force-recreate || exit

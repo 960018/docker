@@ -99,14 +99,14 @@ services:
         environment:
             POSTGRES_PASSWORD: 'Bqox56ewGRxrUY5MzFUNx0w23AXN0MY9'
         volumes:
-            - ./postgres13:/var/lib/postgresql
+            - ./postgres13:/var/lib/postgresql/data
             - ./pg:/data
         restart: always
         networks:
             - backend
         ports:
             - 127.0.0.1:5433:5432
-        mem_limit: 256M
+        mem_limit: 4g
         profiles: ["full", "local"]
 
     postgres14:
@@ -115,7 +115,7 @@ services:
         environment:
             POSTGRES_PASSWORD: 'Bqox56ewGRxrUY5MzFUNx0w23AXN0MY9'
         volumes:
-            - ./postgres14:/var/lib/postgresql
+            - ./postgres14:/var/lib/postgresql/data
             - ./pg:/data
         restart: always
         networks:
@@ -131,7 +131,7 @@ services:
         environment:
             POSTGRES_PASSWORD: 'Bqox56ewGRxrUY5MzFUNx0w23AXN0MY9'
         volumes:
-            - ./postgres15:/var/lib/postgresql
+            - ./postgres15:/var/lib/postgresql/data
             - ./pg:/data
         restart: always
         networks:
@@ -139,7 +139,7 @@ services:
         ports:
             - 127.0.0.1:5435:5432
         mem_limit: 256M
-        profiles: ["full", "local"]
+        profiles: ["full"]
 
     postgres16:
         image: postgres:${POSTGRES16}
@@ -147,7 +147,7 @@ services:
         environment:
             POSTGRES_PASSWORD: 'Bqox56ewGRxrUY5MzFUNx0w23AXN0MY9'
         volumes:
-            - ./postgres16:/var/lib/postgresql
+            - ./postgres16:/var/lib/postgresql/data
             - ./pg:/data
         restart: always
         networks:
@@ -155,4 +155,4 @@ services:
         ports:
             - 127.0.0.1:5436:5432
         mem_limit: 256M
-        profiles: ["full", "local"]
+        profiles: ["full"]
