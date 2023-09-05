@@ -1,6 +1,6 @@
 ARG     OS
 
-FROM    ghcr.io/960018/php-fpm:$OS-testing
+FROM    ghcr.io/960018/php-fpm:testing-$OS
 
 USER    root
 
