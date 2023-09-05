@@ -6,6 +6,7 @@ pg/
 postgres13/
 postgres14/
 postgres15/
+postgres16/
 traefik/log/
 php/src/
 php/source/
