@@ -31,3 +31,6 @@ docker buildx build --tag ghcr.io/960018/node:18-$ARCH-echo         --push --com
 docker buildx build --tag ghcr.io/960018/curl:$ARCH                 --push --compress --no-cache --sbom=false --provenance=false -f curl.dockerfile .                                  || exit
 docker buildx build --tag ghcr.io/960018/php-fpm:$ARCH              --push --compress --no-cache --sbom=false --provenance=false -f php.dockerfile --build-arg OS=$ARCH .              || exit
 docker buildx build --tag ghcr.io/960018/php-fpm:testing-$ARCH      --push --compress --no-cache --sbom=false --provenance=false -f php.testing.dockerfile --build-arg OS=$ARCH .      || exit
+
+docker buildx build --tag ghcr.io/960018/php-fpm:$ARCH-sock         --push --compress --no-cache --sbom=false --provenance=false -f php.sock.dockerfile --build-arg OS=$ARCH .         || exit
+docker buildx build --tag ghcr.io/960018/php-fpm:testing-$ARCH-sock --push --compress --no-cache --sbom=false --provenance=false -f php.testing.sock.dockerfile --build-arg OS=$ARCH . || exit
