@@ -6,7 +6,7 @@ ARG     OS
 
 USER    root
 
-ENV     PHP_VERSION 8.3.0-dev
+ENV     PHP_VERSION 8.4.0-dev
 ENV     PHP_INI_DIR /usr/local/etc/php
 ENV     PHP_CFLAGS "-fstack-protector-strong -fpic -fpie -O2 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native -mcpu=native"
 ENV     PHP_CPPFLAGS "$PHP_CFLAGS"
@@ -125,8 +125,8 @@ RUN     \
 &&      docker-php-ext-install gd \
 &&      docker-php-ext-enable gd \
 &&      mkdir --parents /home/vairogs/extensions \
-&&      install-php-extensions php-memcached-dev/php-memcached@master inotify msgpack lzf pdo_pgsql pgsql zip krakjoe/apcu@master igbinary/igbinary@master Imagick/imagick@develop event simdjson \
-        ev lz4 yac yaml zstd
+&&      install-php-extensions php-memcached-dev/php-memcached@master inotify msgpack lzf pdo_pgsql pgsql zip krakjoe/apcu@master igbinary/igbinary@master Imagick/imagick@develop simdjson \
+        ev lz4 yac yaml zstd event
 
 RUN     \
         set -eux \
@@ -220,7 +220,7 @@ FROM    ghcr.io/960018/scratch:latest
 
 COPY    --from=builder / /
 
-ENV     PHP_VERSION 8.3.0-dev
+ENV     PHP_VERSION 8.4.0-dev
 ENV     PHP_INI_DIR /usr/local/etc/php
 ENV     PHP_CFLAGS "-fstack-protector-strong -fpic -fpie -O2 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native -mcpu=native"
 ENV     PHP_CPPFLAGS "$PHP_CFLAGS"
