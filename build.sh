@@ -23,7 +23,7 @@ docker buildx build --tag ghcr.io/960018/nginx:$ARCH                --push --com
 docker buildx build --tag ghcr.io/960018/keydb:$ARCH                --push --compress --no-cache --sbom=false --provenance=false -f keydb.dockerfile .                                 || exit
 docker buildx build --tag ghcr.io/960018/bun:$ARCH                  --push --compress --no-cache --sbom=false --provenance=false -f bun.dockerfile .                                   || exit
 
-docker buildx build --tag ghcr.io/960018/node:20-$ARCH              --push --compress --no-cache --sbom=false --provenance=false -f node.dockerfile --build-arg VERSION=20.5.1 .       || exit
+docker buildx build --tag ghcr.io/960018/node:20-$ARCH              --push --compress --no-cache --sbom=false --provenance=false -f node.dockerfile --build-arg VERSION=20.6.0 .       || exit
 docker buildx build --tag ghcr.io/960018/node:18-$ARCH              --push --compress --no-cache --sbom=false --provenance=false -f node.dockerfile --build-arg VERSION=18.17.1 .      || exit
 docker buildx build --tag ghcr.io/960018/node:18-$ARCH-ip           --push --compress --no-cache --sbom=false --provenance=false -f node.ip.dockerfile --build-arg OS=$ARCH .          || exit
 docker buildx build --tag ghcr.io/960018/node:18-$ARCH-echo         --push --compress --no-cache --sbom=false --provenance=false -f node.echo.dockerfile --build-arg OS=$ARCH .        || exit
