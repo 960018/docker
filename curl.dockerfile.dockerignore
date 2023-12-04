@@ -1,5 +1,4 @@
 *
 !curl.dockerfile
-!curl/src/
-!curl/msrc/
+!curl/
 !global/
