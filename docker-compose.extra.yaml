@@ -1,0 +1,90 @@
+networks:
+
+    frontend:
+        name: frontend
+        external: true
+
+    backend:
+        name: backend
+        external: true
+
+volumes:
+
+    redisdata:
+    socks:
+        external: true
+    postgres13:
+        external: true
+    postgres14:
+        external: true
+    postgres15:
+        external: true
+    postgres16:
+        external: true
+
+x-pg-data: &x-pg-data
+   ./pg:/data
+
+x-sock: &x-sock
+    socks:/tmp/docker/
+
+services:
+
+    portaineragent:
+        image: portainer/agent:${PORTAINER}
+        container_name: portaineragent
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+            - /var/lib/docker/volumes:/var/lib/docker/volumes
+        networks:
+            - backend
+        mem_limit: 64M
+        tmpfs: /tmp
+
+    portainer:
+        image: portainer/portainer-ce:${PORTAINER}
+        container_name: portainer
+        command: -H tcp://portaineragent:9001 --tlsskipverify
+        volumes:
+            - ./portainer/data:/data
+        networks:
+            - frontend
+            - backend
+        mem_limit: 256M
+        tmpfs: /tmp
+        labels:
+            - traefik.enable=true
+            - traefik.docker.network=frontend
+            - traefik.constraint-label=public
+            - traefik.http.routers.portainer.entrypoints=https
+            - traefik.http.routers.portainer.tls=true
+            - traefik.http.routers.portainer.rule=Host(`portainer.dev.io`)
+            - traefik.http.services.portainer.loadbalancer.server.port=9000
+            - traefik.http.routers.portainer.service=portainer
+
+    mercure:
+        image: dunglas/mercure:${MERCURE}
+        container_name: mercure
+        command: /usr/bin/caddy run --config /etc/caddy/Caddyfile.dev
+        volumes:
+            - ./mercure/data:/data
+            - ./mercure/config:/config
+        mem_limit: 1G
+        restart: unless-stopped
+        tmpfs: /tmp
+        networks:
+            - frontend
+            - backend
+        labels:
+            - traefik.enable=true
+            - traefik.docker.network=frontend
+            - traefik.constraint-label=public
+            - traefik.http.routers.mercure.entrypoints=https
+            - traefik.http.routers.mercure.tls=true
+            - traefik.http.routers.mercure.rule=Host(`mercure.dev.io`)
+            - traefik.http.services.mercure.loadbalancer.server.port=80
+            - traefik.http.routers.mercure.service=mercure
+        environment:
+            SERVER_NAME: ':80'
+            MERCURE_PUBLISHER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
+            MERCURE_SUBSCRIBER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
