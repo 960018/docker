@@ -11,6 +11,25 @@ networks:
 volumes:
 
     redisdata:
+    socks:
+        external: true
+    postgres13:
+        external: true
+    postgres14:
+        external: true
+    postgres15:
+        external: true
+    postgres16:
+        external: true
+
+x-variables: &x-variables
+    POSTGRES_PASSWORD: 'Bqox56ewGRxrUY5MzFUNx0w23AXN0MY9'
+
+x-pg-data: &x-pg-data
+    ./pg:/data
+
+x-sock: &x-sock
+    socks:/tmp/docker/
 
 services:
 
@@ -29,6 +48,7 @@ services:
             - /var/run/docker.sock:/var/run/docker.sock
             - ./traefik/log:/etc/traefik/log
             - ./traefik/dynamic_conf:/dynamic_conf
+            - *x-sock
         restart: always
         command:
             - --log
@@ -59,6 +79,7 @@ services:
             - --entrypoints.https.http.redirections.entryPoint.scheme=https
             - --entrypoints.https.http.redirections.entrypoint.permanent=true
             - --serversTransport.insecureSkipVerify=true
+            - --providers.redis.endpoints=keydb:6379
         labels:
             - traefik.enable=true
             - traefik.docker.network=frontend
@@ -76,7 +97,18 @@ services:
             timeout: 30s
             retries: 3
         mem_limit: 256M
+        tmpfs: /tmp
         profiles: ["full"]
+
+    tmp:
+        image: busybox:uclibc
+        container_name: tmp
+        mem_limit: 64M
+        command: chmod -R 777 /tmp/docker
+        volumes:
+            - *x-sock
+        networks:
+            - backend
 
     keydb:
         image: ghcr.io/960018/keydb:${ARCH}
@@ -86,73 +118,123 @@ services:
         restart: always
         volumes:
             - ./keydb/keydb.conf:/etc/keydb/keydb.conf
-            - redisdata:/data
+            - *x-sock
         ports:
             - 127.0.0.1:6379:6379
-        command: keydb-server /etc/keydb/keydb.conf
+        command: sh -c "mkdir -p /tmp/docker/redis && keydb-server /etc/keydb/keydb.conf"
         mem_limit: 64M
+        tmpfs: /tmp
+        depends_on:
+            - tmp
+        healthcheck:
+            test: [ "CMD", "keydb-cli", "--raw", "incr", "ping" ]
+            interval: 10s
+            timeout: 5s
+            retries: 5
         profiles: ["full", "local"]
 
     postgres13:
         image: postgres:${POSTGRES13}
         container_name: postgres13
         environment:
-            POSTGRES_PASSWORD: 'Bqox56ewGRxrUY5MzFUNx0w23AXN0MY9'
+            <<: *x-variables
         volumes:
             - ./postgres13:/var/lib/postgresql/data
-            - ./pg:/data
+            - *x-pg-data
+            - postgres13:/var/run
         restart: always
         networks:
             - backend
         ports:
             - 127.0.0.1:5433:5432
-        mem_limit: 4g
+        mem_limit: 1g
+        tmpfs: /tmp
+        healthcheck:
+            test: [ "CMD-SHELL", "pg_isready" ]
+            interval: 10s
+            timeout: 5s
+            retries: 5
         profiles: ["full", "local"]
 
     postgres14:
         image: postgres:${POSTGRES14}
         container_name: postgres14
         environment:
-            POSTGRES_PASSWORD: 'Bqox56ewGRxrUY5MzFUNx0w23AXN0MY9'
+            <<: *x-variables
         volumes:
             - ./postgres14:/var/lib/postgresql/data
-            - ./pg:/data
+            - *x-pg-data
+            - postgres14:/var/run
         restart: always
         networks:
             - backend
         ports:
             - 127.0.0.1:5434:5432
-        mem_limit: 256M
+        mem_limit: 1g
+        tmpfs: /tmp
+        healthcheck:
+            test: [ "CMD-SHELL", "pg_isready" ]
+            interval: 10s
+            timeout: 5s
+            retries: 5
         profiles: ["full", "local"]
 
     postgres15:
         image: postgres:${POSTGRES15}
         container_name: postgres15
         environment:
-            POSTGRES_PASSWORD: 'Bqox56ewGRxrUY5MzFUNx0w23AXN0MY9'
+            <<: *x-variables
         volumes:
             - ./postgres15:/var/lib/postgresql/data
-            - ./pg:/data
+            - *x-pg-data
+            - postgres15:/var/run
         restart: always
         networks:
             - backend
         ports:
             - 127.0.0.1:5435:5432
-        mem_limit: 256M
+        mem_limit: 1g
+        tmpfs: /tmp
+        healthcheck:
+            test: [ "CMD-SHELL", "pg_isready" ]
+            interval: 10s
+            timeout: 5s
+            retries: 5
         profiles: ["full"]
 
     postgres16:
         image: postgres:${POSTGRES16}
         container_name: postgres16
         environment:
-            POSTGRES_PASSWORD: 'Bqox56ewGRxrUY5MzFUNx0w23AXN0MY9'
+            <<: *x-variables
         volumes:
             - ./postgres16:/var/lib/postgresql/data
-            - ./pg:/data
+            - *x-pg-data
+            - postgres16:/var/run
         restart: always
         networks:
             - backend
         ports:
             - 127.0.0.1:5436:5432
+        mem_limit: 1g
+        tmpfs: /tmp
+        healthcheck:
+            test: [ "CMD-SHELL", "pg_isready" ]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+        profiles: ["full"]
+
+    memcached:
+        image: memcached:${MEMCACHED}
+        container_name: memcached
+        ports:
+            - 127.0.0.1:11211:11211
+        networks:
+            - backend
         mem_limit: 256M
+        tmpfs: /tmp
+        volumes:
+            - *x-sock
+        command: "memcached -s /tmp/docker/memcached.sock -a 777 -o modern"
         profiles: ["full"]

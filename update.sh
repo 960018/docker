@@ -1,24 +1,36 @@
 #!/usr/bin/env bash
 
+source .env
+
 cd curl || exit
-rm -rf src msrc
+rm -rf src
 cd source || exit
-git reset --hard; 
-git pull; 
-git submodule update --init --force;
-cd .. || exit
-cd msh3 || exit
-git reset --hard; 
-git pull; 
+git reset --hard;
+git pull;
 git submodule update --init --force;
 cd .. || exit
 cp -r source src
 cd src || exit
 rm -rf .git/ .github/
 cd .. || exit
-cp -r msh3 msrc
-cd msrc || exit
-rm -rf .git/ .github/
+cd clone || exit
+
+subs=("nghttp3" "ngtcp2" "wolfssl")
+
+for j in "${subs[@]}"
+do
+    cd "$j" || exit
+    git reset --hard;
+    git pull;
+    git submodule update --init --force;
+    cd .. || exit
+    rm -rf "${j}src"
+    cp -r "$j" "${j}src"
+    cd "${j}src" || exit
+    rm -rf .git/ .github/
+    cd .. || exit
+done
+
 cd .. || exit
 cd .. || exit
 
@@ -35,7 +47,7 @@ rm -rf .git/ .github/
 cd .. || exit
 cd clone || exit
 
-exts=("phpredis" "phpiredis" "runkit7" "xdebug")
+exts=("phpredis" "phpiredis" "runkit7" "xdebug" "php-spx")
 
 for i in "${exts[@]}"
 do
@@ -52,12 +64,16 @@ do
 done
 
 cd .. || exit
+cd .. || exit
 
-docker pull mlocati/php-extension-installer:latest
-docker pull composer:latest
-docker pull eqalpha/keydb:latest
-docker pull debian:sid-slim
-docker pull nginx:1.25-bookworm
-docker pull node:20-bookworm-slim
-docker pull node:18-bookworm-slim
-docker pull oven/bun:canary
+docker pull mlocati/php-extension-installer:latest || exit
+docker pull composer:latest || exit
+docker pull eqalpha/keydb:latest || exit
+docker pull debian:sid-slim || exit
+docker pull debian:experimental || exit
+docker pull nginx:1.25-bookworm || exit
+docker pull "node:${NODE20}-bookworm-slim" || exit
+docker pull "node:${NODE21}-bookworm-slim" || exit
+docker pull "node:${NODE18}-bookworm-slim" || exit
+docker pull oven/bun:canary || exit
+docker pull moby/buildkit:master-rootless || exit
