@@ -1,6 +1,6 @@
 ARG     VERSION
 
-FROM    node:$VERSION-bookworm-slim as builder
+FROM    node:${VERSION}-bookworm-slim as builder
 
 ENV     container=docker
 ENV     DEBIAN_FRONTEND=noninteractive
@@ -8,7 +8,7 @@ ENV     DEBIAN_FRONTEND=noninteractive
 SHELL   ["/bin/bash", "-o", "pipefail", "-c"]
 
 COPY    global/01_nodoc  /etc/dpkg/dpkg.cfg.d/01_nodoc
-COPY    global/02nocache /etc/apt/apt.conf.d/02nocache
+COPY    global/02_nocache /etc/apt/apt.conf.d/02_nocache
 COPY    global/compress  /etc/initramfs-tools/conf.d/compress
 COPY    global/modules   /etc/initramfs-tools/conf.d/modules
 
@@ -25,7 +25,8 @@ RUN     \
 &&      echo 'alias ll="ls -lahs"' >> /root/.bashrc \
 &&      apt-get update \
 &&      apt-get upgrade -y \
-&&      apt-get install -y --no-install-recommends procps \
+&&      apt-get install -y --no-install-recommends procps curl ca-certificates unzip \
+&&      update-ca-certificates \
 &&      apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
 &&      apt-get autoremove -y --purge \
 &&      rm -rf \
@@ -47,10 +48,14 @@ RUN     \
             /root/.cache \
 &&      usermod -a -G dialout vairogs \
 &&      npm i -g npm@next-10 \
-&&      npm i -g pnpm \
-&&      npm i -g bun@canary
+&&      npm i -g pnpm
 
 USER    vairogs
+
+RUN     \
+        set -eux \
+&&      curl https://bun.sh/install | bash \
+&&      /home/vairogs/.bun/bin/bun upgrade --canary
 
 FROM    ghcr.io/960018/scratch:latest
 
