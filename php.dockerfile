@@ -1,6 +1,6 @@
 ARG     OS
 
-FROM    ghcr.io/960018/curl:$OS as builder
+FROM    ghcr.io/960018/curl:${OS} as builder
 
 ARG     OS
 
@@ -35,19 +35,20 @@ RUN     \
         set -eux \
 &&      apt-get update \
 &&      apt-get upgrade -y \
-&&      apt-get install -y --no-install-recommends make libc-dev libc6-dev gcc g++ cpp bison git autoconf dpkg-dev dpkg re2c libxml2-dev libxml2 libssl-dev libssl3 libsqlite3-dev libsqlite3-0 xz-utils libargon2-dev libargon2-1 \
+&&      apt-get install -y --no-install-recommends --allow-downgrades make libc-dev libc6-dev gcc g++ cpp bison git autoconf dpkg-dev dpkg re2c libxml2-dev libxml2 libsqlite3-dev libsqlite3-0 xz-utils libargon2-dev libargon2-1 \
         libonig-dev libonig5 libreadline-dev libreadline8 libsodium-dev libsodium23 zlib1g-dev zlib1g libbz2-dev libbz2-1.0 libgmp-dev libgmp10 libedit-dev libedit2 libtidy-dev libtidy5deb1 libnghttp3-dev libnghttp3-3 \
         libnghttp2-dev nghttp2 idn2 libidn2-0 librtmp-dev librtmp1 rtmpdump libgsasl-dev libgsasl18 libpsl-dev libpsl5 zstd libzstd-dev libbrotli1 libbrotli-dev libjpeg62-turbo libjpeg62-turbo-dev libpng16-16 libpng-dev \
-        libwebp7 libwebp-dev libfreetype-dev libfreetype6 liblzf-dev liblzf1 liblzf-dev liblzf1 liblz4-dev liblzf-dev liblz4-1 gdb-minimal libfcgi-bin wget \
-&&      dpkg -i /home/vairogs/libhiredis-$OS.deb \
-&&      dpkg -i /home/vairogs/libhiredis-dev-$OS.deb \
-&&      chmod -R 777 /usr/local/bin \
-&&      chmod 777 /home/vairogs/installer \
+        libwebp7 libwebp-dev libfreetype-dev libfreetype6 liblzf-dev liblzf1 liblzf-dev liblzf1 liblz4-dev liblzf-dev liblz4-1 gdb-minimal libfcgi-bin wget cron libssl-dev libssl3 \
+# &&      apt-get install -y --no-install-recommends libhiredis1.1.0 libhiredis-dev \
+&&      dpkg -i /home/vairogs/libhiredis-${OS}.deb \
+&&      dpkg -i /home/vairogs/libhiredis-dev-${OS}.deb \
+&&      chmod -R 1777 /usr/local/bin \
+&&      chmod 1777 /home/vairogs/installer \
 &&      mkdir --parents "$PHP_INI_DIR/conf.d" \
 &&      [ ! -d /var/www/html ]; \
         mkdir --parents /var/www/html \
 &&      chown vairogs:vairogs /var/www/html \
-&&      chmod 777 -R /var/www/html \
+&&      chmod 1777 -R /var/www/html \
 &&      export \
             CFLAGS="$PHP_CFLAGS" \
             CPPFLAGS="$PHP_CPPFLAGS" \
@@ -56,7 +57,7 @@ RUN     \
 &&      gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
 &&      ./buildconf --force \
 &&      ./configure \
-            --build="$gnuArch" \
+            --build="${gnuArch}" \
             --with-config-file-path="$PHP_INI_DIR" \
             --with-config-file-scan-dir="$PHP_INI_DIR/conf.d" \
             --disable-cgi \
@@ -111,7 +112,7 @@ RUN     \
             ~/.pearrc \
 &&      php --version \
 &&      mkdir --parents "$PHP_INI_DIR/conf.d" \
-&&      chmod -R 777 /usr/local/bin \
+&&      chmod -R 1777 /usr/local/bin \
 &&      docker-php-ext-enable sodium \
 &&      mkdir --parents --mode=777 --verbose /run/php-fpm \
 &&      mkdir --parents /var/www/html/config \
@@ -125,8 +126,24 @@ RUN     \
 &&      docker-php-ext-install gd \
 &&      docker-php-ext-enable gd \
 &&      mkdir --parents /home/vairogs/extensions \
-&&      install-php-extensions php-memcached-dev/php-memcached@master inotify msgpack lzf pdo_pgsql pgsql zip krakjoe/apcu@master igbinary/igbinary@master Imagick/imagick@develop simdjson \
-        ev lz4 yac yaml zstd event
+&&      install-php-extensions \
+            krakjoe/apcu@master \
+            php-ds/ext-ds@master \
+            ev \
+            event \
+            igbinary/igbinary@master \
+            Imagick/imagick@develop \
+            inotify \
+            lz4 \
+            lzf \
+            php-memcached-dev/php-memcached@master \
+            msgpack \
+            pdo_pgsql \
+            simdjson \
+            yac \
+            yaml \
+            zip \
+            zstd
 
 RUN     \
         set -eux \
@@ -188,9 +205,6 @@ RUN     \
             /usr/share/vim/vim90/doc \
             /usr/local/bin/install-php-extensions \
             /usr/share/man/* \
-            /usr/bin/gcc \
-            /usr/bin/g++ \
-            /usr/bin/cpp \
 &&      mkdir --parents /var/lib/php/sessions \
 &&      chown -R vairogs:vairogs /var/lib/php/sessions \
 &&      mkdir --parents /var/lib/php/opcache \
@@ -208,13 +222,14 @@ RUN     \
 &&      echo zlib.output_compression = 4096 >> /usr/local/etc/php/conf.d/docker-php-ext-zlib.ini \
 &&      echo zlib.output_compression_level = 9 >> /usr/local/etc/php/conf.d/docker-php-ext-zlib.ini \
 &&      git config --global --add safe.directory "*" \
-&&      chown -R vairogs:vairogs /home/vairogs
+&&      chown -R vairogs:vairogs /home/vairogs \
+&&      chmod u+s /usr/sbin/cron
 
 WORKDIR /var/www/html
 
 USER    vairogs
 
-CMD     ["php-fpm"]
+CMD     ["sh", "-c", "cron && php-fpm"]
 
 FROM    ghcr.io/960018/scratch:latest
 
@@ -234,4 +249,4 @@ WORKDIR /var/www/html
 EXPOSE  9000
 
 ENTRYPOINT ["docker-php-entrypoint"]
-CMD     ["php-fpm"]
+CMD     ["sh", "-c", "cron && php-fpm"]
