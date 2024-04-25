@@ -1,4 +1,4 @@
-FROM    debian:sid-slim as builder
+FROM    debian:sid-slim AS builder
 
 LABEL   maintainer="support+docker@vairogs.com"
 ENV     container=docker
@@ -47,7 +47,7 @@ RUN     \
 &&      apt-get update \
 &&      apt-get upgrade -y \
 &&      apt-get install -y --no-install-recommends make automake autoconf libtool ca-certificates gcc g++ libbrotli1 libbrotli-dev zstd libzstd-dev librtmp-dev librtmp1 rtmpdump pkg-config \
-        libgsasl-dev libgsasl18 libpsl-dev libpsl5 perl libnghttp2-dev nghttp2 libssl-dev libssl3 \
+        libgsasl-dev libgsasl18 libpsl-dev perl libnghttp2-dev nghttp2 libssl-dev libssl3t64 \
 &&      cd  nghttp3 \
 &&      autoreconf -fi \
 &&      ./configure --prefix=/opt/nghttp3 --enable-lib-only \
@@ -55,9 +55,9 @@ RUN     \
 &&      make install \
 &&      cd ../wolfssl \
 &&      autoreconf -fi \
-&&      ./configure --prefix=/opt/wolfssl --enable-quic --enable-session-ticket --enable-earlydata --enable-psk --enable-harden --enable-altcertchains --disable-examples \
+&&      ./configure --prefix=/opt/wolfssl --enable-session-ticket --enable-earlydata --enable-psk --enable-altcertchains --disable-examples \
             --enable-dtl --enable-sctp --enable-opensslextra --enable-opensslall --enable-sniffer --enable-sha512 --enable-ed25519 --enable-rsapss --enable-base64encode --enable-tlsx \
-            --enable-scrypt --disable-crypttests --enable-fast-rsa --enable-fastmath \
+            --enable-scrypt --disable-crypttests --enable-fast-rsa --enable-fastmath --enable-harden --enable-quic --enable-all \
 &&      make \
 &&      make install \
 &&      cd ../ngtcp2 \
@@ -67,7 +67,7 @@ RUN     \
 &&      make install \
 &&      cd ../curl \
 &&      autoreconf -fi \
-&&      ./configure CFLAGS='-fstack-protector-strong -fpic -fpie -O2 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native -mcpu=native' \
+&&      ./configure CFLAGS='-fstack-protector-strong -fpic -fpie -O3 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native -mcpu=native' \
             --with-wolfssl=/opt/wolfssl --with-zlib --with-brotli --enable-ipv6 --with-libidn2 --enable-sspi --with-librtmp --with-ngtcp2=/opt/ngtcp2 --with-nghttp3=/opt/nghttp3 --with-nghttp2 --enable-websockets --with-zstd --with-psl --disable-manual \
 &&      make \
 &&      make install \

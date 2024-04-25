@@ -27,7 +27,7 @@ docker pull "postgres:$POSTGRES14" || exit
 docker pull "postgres:$POSTGRES15" || exit
 docker pull "postgres:$POSTGRES16" || exit
 docker pull "memcached:$MEMCACHED" || exit
-docker pull "busybox:uclibc" || exit
+docker pull "bash:devel" || exit
 
 if [ -z $(docker network ls --filter name=^frontend$ --format="{{ .Name }}") ]; then
     docker network create frontend;
@@ -37,7 +37,7 @@ if [ -z $(docker network ls --filter name=^backend$ --format="{{ .Name }}") ]; t
     docker network create backend;
 fi
 
-dirs=("socks" "postgres13" "postgres14" "postgres15" "postgres16")
+dirs=("socks" "postgres13" "postgres14" "postgres15" "postgres16" "pgr13")
 
 for i in "${dirs[@]}"
 do
@@ -48,6 +48,5 @@ done
 
 PROFILE=${1:-'full'}
 
-docker compose --profile full -f docker-compose.start.yaml down
-docker kill $(docker ps -q)
+docker compose --profile full -f docker-compose.start.yaml down --volumes
 docker compose --profile $PROFILE -f docker-compose.start.yaml up -d --force-recreate || exit

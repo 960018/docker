@@ -1,0 +1,4 @@
+*
+!node.scripts.dockerfile
+!node/echo
+!node/ip

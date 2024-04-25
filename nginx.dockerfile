@@ -1,4 +1,4 @@
-FROM    nginx:1.25-bookworm as builder
+FROM    nginx:1.26-bookworm AS builder
 
 ENV     container=docker
 ENV     DEBIAN_FRONTEND=noninteractive

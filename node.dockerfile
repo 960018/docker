@@ -1,6 +1,6 @@
 ARG     VERSION
 
-FROM    node:${VERSION}-bookworm-slim as builder
+FROM    node:${VERSION}-bookworm-slim AS builder
 
 ENV     container=docker
 ENV     DEBIAN_FRONTEND=noninteractive
@@ -67,4 +67,5 @@ ENV     NODE_VERSION=${VERSION}
 ENV     YARN_VERSION=1.22.19
 
 ENTRYPOINT ["docker-entrypoint.sh"]
+
 CMD     ["node"]

@@ -1,20 +1,19 @@
-ARG     OS
+ARG     ARCH
 
-FROM    ghcr.io/960018/curl:${OS} as builder
+FROM    ghcr.io/960018/curl:${ARCH} AS builder
 
-ARG     OS
+ARG     ARCH
 
 USER    root
 
 ENV     PHP_VERSION 8.4.0-dev
 ENV     PHP_INI_DIR /usr/local/etc/php
-ENV     PHP_CFLAGS "-fstack-protector-strong -fpic -fpie -O2 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native -mcpu=native"
+ENV     PHP_CFLAGS "-fstack-protector-strong -fpic -fpie -O3 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native -mcpu=native"
 ENV     PHP_CPPFLAGS "$PHP_CFLAGS"
-ENV     PHP_LDFLAGS "-Wl,-O2 -pie"
+ENV     PHP_LDFLAGS "-Wl,-O3 -pie"
 
 COPY    php/no-debian-php /etc/apt/preferences.d/no-debian-php
 COPY    php/src/          /usr/src/php
-COPY    php/redis/        /home/vairogs/
 
 COPY    php/docker/docker-php-entrypoint    /usr/local/bin/docker-php-entrypoint
 COPY    php/docker/docker-php-ext-configure /usr/local/bin/docker-php-ext-configure
@@ -36,12 +35,10 @@ RUN     \
 &&      apt-get update \
 &&      apt-get upgrade -y \
 &&      apt-get install -y --no-install-recommends --allow-downgrades make libc-dev libc6-dev gcc g++ cpp bison git autoconf dpkg-dev dpkg re2c libxml2-dev libxml2 libsqlite3-dev libsqlite3-0 xz-utils libargon2-dev libargon2-1 \
-        libonig-dev libonig5 libreadline-dev libreadline8 libsodium-dev libsodium23 zlib1g-dev zlib1g libbz2-dev libbz2-1.0 libgmp-dev libgmp10 libedit-dev libedit2 libtidy-dev libtidy5deb1 libnghttp3-dev libnghttp3-3 \
-        libnghttp2-dev nghttp2 idn2 libidn2-0 librtmp-dev librtmp1 rtmpdump libgsasl-dev libgsasl18 libpsl-dev libpsl5 zstd libzstd-dev libbrotli1 libbrotli-dev libjpeg62-turbo libjpeg62-turbo-dev libpng16-16 libpng-dev \
-        libwebp7 libwebp-dev libfreetype-dev libfreetype6 liblzf-dev liblzf1 liblzf-dev liblzf1 liblz4-dev liblzf-dev liblz4-1 gdb-minimal libfcgi-bin wget cron libssl-dev libssl3 \
-# &&      apt-get install -y --no-install-recommends libhiredis1.1.0 libhiredis-dev \
-&&      dpkg -i /home/vairogs/libhiredis-${OS}.deb \
-&&      dpkg -i /home/vairogs/libhiredis-dev-${OS}.deb \
+            libonig-dev libonig5 libreadline-dev libreadline8t64 libsodium-dev libsodium23 zlib1g-dev zlib1g libbz2-dev libbz2-1.0 libgmp-dev libgmp10 libedit-dev libedit2 libtidy-dev libtidy5deb1 libnghttp3-dev libnghttp3-3 \
+            libnghttp2-dev nghttp2 idn2 libidn2-0 librtmp-dev librtmp1 rtmpdump libgsasl-dev libgsasl18 libpsl-dev libpsl5t64 zstd libzstd-dev libbrotli1 libbrotli-dev libjpeg62-turbo libjpeg62-turbo-dev libpng16-16t64 libpng-dev \
+            libwebp7 libwebp-dev libfreetype-dev libfreetype6 liblzf-dev liblzf1 liblzf-dev liblzf1 liblz4-dev liblzf-dev liblz4-1 gdb-minimal libfcgi-bin wget cron libssl-dev libssl3t64 libhiredis1.1.0 libhiredis-dev libpq5 libpq-dev \
+            libzip4t64 libzip-dev libmagickwand-6.q16-dev libmagickwand-6.q16-7t64 libmagickcore-6.q16-7t64 libmagickcore-6.q16-dev libevent-2.1-7t64 libevent-dev \
 &&      chmod -R 1777 /usr/local/bin \
 &&      chmod 1777 /home/vairogs/installer \
 &&      mkdir --parents "$PHP_INI_DIR/conf.d" \
@@ -92,6 +89,7 @@ RUN     \
             --with-password-argon2 \
             --with-pear \
             --with-pic \
+            --with-pdo-pgsql \
             --with-pdo-sqlite=/usr \
             --with-readline \
             --with-sodium=shared \
@@ -121,43 +119,91 @@ RUN     \
 
 RUN     \
         set -eux \
-&&      export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" \
+&&      export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" PHP_BUILD_PROVIDER='https://github.com/960018/docker' PHP_UNAME="Linux (${ARCH}) - Docker" \
 &&      docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ --with-webp=/usr/include/ \
 &&      docker-php-ext-install gd \
-&&      docker-php-ext-enable gd \
-&&      mkdir --parents /home/vairogs/extensions \
-&&      install-php-extensions \
-            krakjoe/apcu@master \
-            php-ds/ext-ds@master \
-            ev \
-            event \
-            igbinary/igbinary@master \
-            Imagick/imagick@develop \
-            inotify \
-            lz4 \
-            lzf \
-            php-memcached-dev/php-memcached@master \
-            msgpack \
-            pdo_pgsql \
-            simdjson \
-            yac \
-            yaml \
-            zip \
-            zstd
+&&      docker-php-ext-enable gd
+
+#&&      install-php-extensions krakjoe/apcu@master \
+#&&      install-php-extensions php-decimal/ext-decimal@master \
+#&&      install-php-extensions php-ds/ext-ds@master \
 
 RUN     \
         set -eux \
+&&      install-php-extensions ev
+
+#&&      install-php-extensions event \
+
+RUN     \
+        set -eux \
+&&      install-php-extensions igbinary/igbinary@master
+#&&      install-php-extensions Imagick/imagick@develop \
+
+RUN     \
+        set -eux \
+&&      install-php-extensions inotify
+
+RUN     \
+        set -eux \
+&&      install-php-extensions lz4
+
+RUN     \
+        set -eux \
+&&      install-php-extensions lzf
+#&&      install-php-extensions php-memcached-dev/php-memcached@master \
+
+RUN     \
+        set -eux \
+&&      install-php-extensions msgpack
+
+RUN     \
+        set -eux \
+&&      install-php-extensions simdjson
+
+RUN     \
+        set -eux \
+&&      install-php-extensions yac
+
+RUN     \
+        set -eux \
+&&      install-php-extensions yaml
+
+#RUN     \
+#        set -eux \
+#&&      install-php-extensions zip
+
+RUN     \
+        set -eux \
+&&      install-php-extensions zstd
+
+RUN     \
+        set -eux \
+&&      mkdir --parents /home/vairogs/extensions \
 &&      wget -O /usr/local/bin/php-fpm-healthcheck https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/master/php-fpm-healthcheck \
 &&      chmod +x /usr/local/bin/php-fpm-healthcheck \
 &&      chown www-data:www-data /usr/local/bin/php-fpm-healthcheck
 
 COPY    php/clone/phpredissrc/ /home/vairogs/extensions/phpredis/
 COPY    php/clone/phpiredissrc/ /home/vairogs/extensions/phpiredis/
+COPY    php/clone/imagicksrc/ /home/vairogs/extensions/imagick/
+COPY    php/clone/apcusrc/ /home/vairogs/extensions/apcu/
+COPY    php/clone/pecl-eventsrc/ /home/vairogs/extensions/pecl-event/
+COPY    php/clone/ext-dssrc/ /home/vairogs/extensions/ext-ds/
+COPY    php/clone/php_zipsrc/ /home/vairogs/extensions/php_zip/
 
 WORKDIR /home/vairogs/extensions
 
 RUN     \
         set -eux \
+&&      ( \
+            cd  php_zip \
+            &&  phpize \
+            &&  ./configure --enable-zip --with-libzip \
+            &&  make \
+            &&  make install \
+            &&  cd .. || exit \
+        ) \
+&&      docker-php-ext-enable zip \
 &&      ( \
             cd  phpredis \
             &&  phpize \
@@ -176,10 +222,47 @@ RUN     \
             &&  cd .. || exit \
         ) \
 &&      docker-php-ext-enable phpiredis \
+&&      ( \
+            cd  imagick \
+            &&  phpize \
+            &&  ./configure --with-imagick \
+            &&  make \
+            &&  make install \
+            &&  cd .. || exit \
+        ) \
+&&      docker-php-ext-enable imagick \
+&&      ( \
+            cd  apcu \
+            &&  phpize \
+            &&  ./configure --enable-apcu \
+            &&  make \
+            &&  make install \
+            &&  cd .. || exit \
+        ) \
+&&      docker-php-ext-enable apcu \
+&&      ( \
+            cd  ext-ds \
+            &&  phpize \
+            &&  ./configure \
+            &&  make \
+            &&  make install \
+            &&  cd .. || exit \
+        ) \
+&&      docker-php-ext-enable ds \
+&&      ( \
+            cd  pecl-event \
+            &&  phpize \
+            &&  ./configure --with-event-core --with-event-extra \
+            &&  make \
+            &&  make install \
+            &&  cd .. || exit \
+        ) \
+&&      docker-php-ext-enable event \
 &&      apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false make libc-dev libc6-dev cpp gcc g++ autoconf dpkg-dev re2c bison libxml2-dev libssl-dev libsqlite3-dev xz-utils libargon2-dev \
-        libnghttp3-dev libonig-dev libreadline-dev libsodium-dev zlib1g-dev libbz2-dev libgmp-dev libedit-dev libtidy-dev libnghttp2-dev librtmp-dev libgsasl-dev libpsl-dev libzstd-dev libcrypt-dev \
-        libbrotli-dev libjpeg62-turbo-dev libpng-dev libwebp-dev libfreetype-dev liblz4-dev liblzf-dev pkgconf make icu-devtools libbsd-dev libc-dev-bin libc6-dev libgssglue-dev libhiredis-dev libicu-dev \
-        libidn-dev libidn11-dev libidn2-dev libmd-dev libncurses-dev libnsl-dev libntlm0-dev libp11-kit-dev libtasn1-6-dev libtirpc-dev linux-libc-dev cpp-13 gcc-13 fontconfig \
+            libnghttp3-dev libonig-dev libreadline-dev libsodium-dev zlib1g-dev libbz2-dev libgmp-dev libedit-dev libtidy-dev libnghttp2-dev librtmp-dev libgsasl-dev libpsl-dev libzstd-dev libcrypt-dev \
+            libbrotli-dev libjpeg62-turbo-dev libpng-dev libwebp-dev libfreetype-dev liblz4-dev liblzf-dev pkgconf make icu-devtools libbsd-dev libc-dev-bin libc6-dev libgssglue-dev libhiredis-dev libicu-dev \
+            libidn-dev libidn2-dev libmd-dev libncurses-dev libntlm0-dev libp11-kit-dev libtasn1-6-dev linux-libc-dev cpp-13 gcc-13 fontconfig libpq-dev \
+            libzip-dev libmagickwand-6.q16-dev libmagickcore-6.q16-dev libevent-dev \
 &&      apt-get autoremove -y --purge \
 &&      rm -rf \
             ~/.pearrc \
@@ -237,9 +320,9 @@ COPY    --from=builder / /
 
 ENV     PHP_VERSION 8.4.0-dev
 ENV     PHP_INI_DIR /usr/local/etc/php
-ENV     PHP_CFLAGS "-fstack-protector-strong -fpic -fpie -O2 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native -mcpu=native"
+ENV     PHP_CFLAGS "-fstack-protector-strong -fpic -fpie -O3 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native -mcpu=native"
 ENV     PHP_CPPFLAGS "$PHP_CFLAGS"
-ENV     PHP_LDFLAGS "-Wl,-O2 -pie"
+ENV     PHP_LDFLAGS "-Wl,-O3 -pie"
 ENV     PHP_CS_FIXER_IGNORE_ENV 1
 
 STOPSIGNAL SIGQUIT
@@ -249,4 +332,5 @@ WORKDIR /var/www/html
 EXPOSE  9000
 
 ENTRYPOINT ["docker-php-entrypoint"]
+
 CMD     ["sh", "-c", "cron && php-fpm"]

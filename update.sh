@@ -47,7 +47,7 @@ rm -rf .git/ .github/
 cd .. || exit
 cd clone || exit
 
-exts=("phpredis" "phpiredis" "runkit7" "xdebug" "php-spx")
+exts=("phpredis" "phpiredis" "runkit7" "xdebug" "php-spx" "imagick" "apcu" "ext-ds" "pecl-event" "php_zip")
 
 for i in "${exts[@]}"
 do
@@ -70,10 +70,9 @@ docker pull mlocati/php-extension-installer:latest || exit
 docker pull composer:latest || exit
 docker pull eqalpha/keydb:latest || exit
 docker pull debian:sid-slim || exit
-docker pull debian:experimental || exit
-docker pull nginx:1.25-bookworm || exit
-docker pull "node:${NODE20}-bookworm-slim" || exit
+docker pull nginx:1.26-bookworm || exit
 docker pull "node:${NODE21}-bookworm-slim" || exit
 docker pull "node:${NODE18}-bookworm-slim" || exit
 docker pull oven/bun:canary || exit
 docker pull moby/buildkit:master-rootless || exit
+docker pull "varnish:${VARNISH}" || exit

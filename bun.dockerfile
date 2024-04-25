@@ -1,4 +1,4 @@
-FROM    oven/bun:canary as builder
+FROM    oven/bun:canary AS builder
 
 ENV     container=docker
 ENV     DEBIAN_FRONTEND=noninteractive
@@ -52,4 +52,5 @@ FROM    ghcr.io/960018/scratch:latest
 COPY    --from=builder / /
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
-CMD     ["/usr/local/bin/bun"]
+
+CMD     ["bash"]

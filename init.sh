@@ -21,7 +21,7 @@ rm -rf source src
 eval "$(cat php.txt)"
 cd clone || exit
 
-exts=("phpredis" "phpiredis" "runkit7" "xdebug" "php-spx")
+exts=("phpredis" "phpiredis" "runkit7" "xdebug" "php-spx" "imagick" "apcu" "ext-ds" "pecl-event" "php_zip")
 
 for i in "${exts[@]}"
 do

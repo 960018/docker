@@ -4,11 +4,10 @@ import http from "http";
 import os from "os";
 import jwt from "jsonwebtoken";
 import concat from "concat-stream";
-import {promisify} from "util";
 
 const app = express();
 
-const sleep = promisify(setTimeout);
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 app.set("json spaces", 4);
 app.set("trust proxy", ["loopback", "linklocal", "uniquelocal"]);
@@ -28,10 +27,10 @@ app.all("*", (req, res) => {
     const echo = {
         body: req.body,
         cookies: req.cookies,
-        fresh: req.fresh,
         headers: req.headers,
+        fresh: req.fresh,
         hostname: req.hostname,
-        hostname_os: os.hostname(),
+        os_hostname: os.hostname(),
         ip: req.ip,
         ips: req.ips,
         method: req.method,
@@ -41,6 +40,7 @@ app.all("*", (req, res) => {
         servername: req.socket.servername,
         subdomains: req.subdomains,
         xhr: req.xhr,
+        navigator: navigator,
     };
 
     if (req.is("application/json")) {
@@ -56,6 +56,7 @@ app.all("*", (req, res) => {
             echo.jwt = jwt.decode(token, {complete: true});
         }
     }
+
     const setResponseStatusCode = parseInt(
         req.headers["x-set-response-status-code"],
         10

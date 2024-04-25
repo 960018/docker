@@ -1,14 +1,14 @@
-ARG     OS
+ARG     ARCH
 
-FROM    ghcr.io/960018/php-fpm:${OS} as builder
+FROM    ghcr.io/960018/php-fpm:${ARCH} AS builder
 
 USER    root
 
 ENV     PHP_VERSION 8.4.0-dev
 ENV     PHP_INI_DIR /usr/local/etc/php
-ENV     PHP_CFLAGS "-fstack-protector-strong -fpic -fpie -O2 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native -mcpu=native"
+ENV     PHP_CFLAGS "-fstack-protector-strong -fpic -fpie -O3 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native -mcpu=native"
 ENV     PHP_CPPFLAGS "$PHP_CFLAGS"
-ENV     PHP_LDFLAGS "-Wl,-O2 -pie"
+ENV     PHP_LDFLAGS "-Wl,-O3 -pie"
 
 COPY    php/docker/docker-php-ext-enable /usr/local/bin/docker-php-ext-enable
 
@@ -28,7 +28,7 @@ RUN     \
 &&      apt-get update \
 &&      apt-get upgrade -y \
 &&      apt-get install -y --no-install-recommends --allow-downgrades autoconf dpkg-dev dpkg file make libc-dev libc6-dev cpp gcc g++ pkgconf re2c bison \
-            zlib1g-dev zlib1g \
+            zlib1g-dev zlib1g libmagickwand-6.q16-7t64 \
 &&      ( \
             cd xdebug \
             &&  phpize \
@@ -39,15 +39,15 @@ RUN     \
             &&  cd .. || exit \
         ) \
 &&      docker-php-ext-enable xdebug \
-&&      ( \
-             cd  runkit7 \
-             &&  phpize \
-             &&  ./configure \
-             &&  make \
-             &&  make install \
-             &&  cd .. || exit \
-         ) \
-&&      docker-php-ext-enable runkit7 \
+#&&      ( \
+#             cd  runkit7 \
+#             &&  phpize \
+#             &&  ./configure \
+#             &&  make \
+#             &&  make install \
+#             &&  cd .. || exit \
+#         ) \
+#&&      docker-php-ext-enable runkit7 \
 &&      ( \
              cd  php-spx \
              &&  phpize \
@@ -60,6 +60,7 @@ RUN     \
 &&      echo xdebug.mode=debug,coverage >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
 &&      echo xdebug.discover_client_host=0 >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
 &&      echo xdebug.client_host=host.docker.internal >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+&&      echo xdebug.start_with_request=trigger >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
 &&      echo xdebug.log=/tmp/xdebug.log >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
 &&      echo runkit.internal_override=1 >> /usr/local/etc/php/conf.d/docker-php-ext-runkit7.ini \
 &&      echo spx.http_enabled=1 >> /usr/local/etc/php/conf.d/docker-php-ext-spx.ini \
@@ -74,7 +75,7 @@ RUN     \
 &&      echo 'alias req="composer require -nW --ignore-platform-reqs"' >> /home/vairogs/.bashrc \
 &&      echo 'alias rem="composer remove -nW --ignore-platform-reqs"' >> /home/vairogs/.bashrc \
 &&      apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false autoconf dpkg-dev make libc-dev libc6-dev file \
-        pkgconf re2c bison cpp gcc g++ gcc-13 cpp-13 fontconfig zlib1g-dev \
+            pkgconf re2c bison cpp gcc g++ gcc-13 cpp-13 fontconfig zlib1g-dev \
 &&      apt-get autoremove -y --purge \
 &&      mkdir --parents /usr/share/misc/php-spx \
 &&      cp -r php-spx/assets /usr/share/misc/php-spx \
@@ -108,15 +109,18 @@ USER    vairogs
 
 CMD     ["sh", "-c", "cron && php-fpm"]
 
+FROM    ghcr.io/960018/node:21-${ARCH} as node
 FROM    ghcr.io/960018/scratch:latest
 
 COPY    --from=builder / /
+COPY    --from=node /usr/local/bin/node /usr/local/bin
+COPY    --from=node /usr/local/bin/yarn /usr/local/bin
 
 ENV     PHP_VERSION 8.4.0-dev
 ENV     PHP_INI_DIR /usr/local/etc/php
-ENV     PHP_CFLAGS "-fstack-protector-strong -fpic -fpie -O2 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native -mcpu=native"
+ENV     PHP_CFLAGS "-fstack-protector-strong -fpic -fpie -O3 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native -mcpu=native"
 ENV     PHP_CPPFLAGS "$PHP_CFLAGS"
-ENV     PHP_LDFLAGS "-Wl,-O2 -pie"
+ENV     PHP_LDFLAGS "-Wl,-O3 -pie"
 ENV     PHP_CS_FIXER_IGNORE_ENV 1
 
 STOPSIGNAL SIGQUIT

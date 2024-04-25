@@ -21,6 +21,8 @@ volumes:
         external: true
     postgres16:
         external: true
+    pgr13:
+        external: true
 
 x-variables: &x-variables
     POSTGRES_PASSWORD: 'Bqox56ewGRxrUY5MzFUNx0w23AXN0MY9'
@@ -72,7 +74,7 @@ services:
             - --providers.docker.watch
             - --entrypoints.http3.http3=true
             - --entrypoints.http3.http3.advertisedport=443
-            - --entryPoints.http3.address=:443
+#            - --entryPoints.http3.address=:443
             - --entryPoints.http3.address=:443/udp
             - --entryPoints.http3.forwardedHeaders.insecure
             - --entrypoints.http.http.redirections.entryPoint.to=https
@@ -96,19 +98,25 @@ services:
             interval: 30s
             timeout: 30s
             retries: 3
-        mem_limit: 256M
+        mem_limit: 256m
         tmpfs: /tmp
         profiles: ["full"]
 
     tmp:
-        image: busybox:uclibc
+        image: bash:devel
         container_name: tmp
-        mem_limit: 64M
-        command: chmod -R 777 /tmp/docker
+        mem_limit: 8m
+        command: sh -c "mkdir -p /tmp/docker && chmod -R 777 /tmp && bash"
+        tty: true
         volumes:
             - *x-sock
         networks:
             - backend
+        healthcheck:
+            test: "ps aux | grep bash | grep -v grep || exit 1"
+            interval: 10s
+            timeout: 5s
+            retries: 5
 
     keydb:
         image: ghcr.io/960018/keydb:${ARCH}
@@ -117,12 +125,10 @@ services:
             - backend
         restart: always
         volumes:
-            - ./keydb/keydb.conf:/etc/keydb/keydb.conf
             - *x-sock
         ports:
             - 127.0.0.1:6379:6379
-        command: sh -c "mkdir -p /tmp/docker/redis && keydb-server /etc/keydb/keydb.conf"
-        mem_limit: 64M
+        mem_limit: 64m
         tmpfs: /tmp
         depends_on:
             - tmp
@@ -147,10 +153,11 @@ services:
             - backend
         ports:
             - 127.0.0.1:5433:5432
-        mem_limit: 1g
+        mem_limit: 512m
+        shm_size: 256m
         tmpfs: /tmp
         healthcheck:
-            test: [ "CMD-SHELL", "pg_isready" ]
+            test: [ "CMD-SHELL", "pg_isready -U postgres" ]
             interval: 10s
             timeout: 5s
             retries: 5
@@ -170,10 +177,11 @@ services:
             - backend
         ports:
             - 127.0.0.1:5434:5432
-        mem_limit: 1g
+        mem_limit: 512m
+        shm_size: 256m
         tmpfs: /tmp
         healthcheck:
-            test: [ "CMD-SHELL", "pg_isready" ]
+            test: [ "CMD-SHELL", "pg_isready -U postgres" ]
             interval: 10s
             timeout: 5s
             retries: 5
@@ -193,10 +201,11 @@ services:
             - backend
         ports:
             - 127.0.0.1:5435:5432
-        mem_limit: 1g
+        mem_limit: 256m
+        shm_size: 256m
         tmpfs: /tmp
         healthcheck:
-            test: [ "CMD-SHELL", "pg_isready" ]
+            test: [ "CMD-SHELL", "pg_isready -U postgres" ]
             interval: 10s
             timeout: 5s
             retries: 5
@@ -216,10 +225,11 @@ services:
             - backend
         ports:
             - 127.0.0.1:5436:5432
-        mem_limit: 1g
+        mem_limit: 512m
+        shm_size: 256m
         tmpfs: /tmp
         healthcheck:
-            test: [ "CMD-SHELL", "pg_isready" ]
+            test: [ "CMD-SHELL", "pg_isready -U postgres" ]
             interval: 10s
             timeout: 5s
             retries: 5
@@ -232,7 +242,7 @@ services:
             - 127.0.0.1:11211:11211
         networks:
             - backend
-        mem_limit: 256M
+        mem_limit: 128m
         tmpfs: /tmp
         volumes:
             - *x-sock

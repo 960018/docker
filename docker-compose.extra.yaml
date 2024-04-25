@@ -8,26 +8,6 @@ networks:
         name: backend
         external: true
 
-volumes:
-
-    redisdata:
-    socks:
-        external: true
-    postgres13:
-        external: true
-    postgres14:
-        external: true
-    postgres15:
-        external: true
-    postgres16:
-        external: true
-
-x-pg-data: &x-pg-data
-   ./pg:/data
-
-x-sock: &x-sock
-    socks:/tmp/docker/
-
 services:
 
     portaineragent:

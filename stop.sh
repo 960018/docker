@@ -18,4 +18,5 @@ export ARCH
 
 docker login ghcr.io -u "$CR_USER" --password "$CR_PAT"
 
-docker compose --profile full -f docker-compose.start.yaml down
+docker compose --profile full -f docker-compose.start.yaml down --volumes
+docker kill $(docker ps -q)

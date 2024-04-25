@@ -23,6 +23,7 @@ source .env
 docker pull "portainer/agent:$PORTAINER" || exit
 docker pull "portainer/portainer-ce:$PORTAINER" || exit
 docker pull "dunglas/mercure:$MERCURE" || exit
+docker pull "ghcr.io/gethomepage/homepage:latest" || exit
 
 if [ -z $(docker network ls --filter name=^frontend$ --format="{{ .Name }}") ]; then
     docker network create frontend;
@@ -32,5 +33,5 @@ if [ -z $(docker network ls --filter name=^backend$ --format="{{ .Name }}") ]; t
     docker network create backend;
 fi
 
-docker compose --profile full -f docker-compose.extra.yaml down
+docker compose --profile full -f docker-compose.extra.yaml down --volumes
 docker compose -f docker-compose.extra.yaml up -d --force-recreate || exit

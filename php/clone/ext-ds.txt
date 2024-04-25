@@ -1,0 +1,1 @@
+git clone --single-branch https://github.com/php-ds/ext-ds.git

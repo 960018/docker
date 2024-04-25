@@ -1,4 +1,4 @@
-FROM    eqalpha/keydb:latest as builder
+FROM    eqalpha/keydb:latest AS builder
 
 ENV     container=docker
 ENV     DEBIAN_FRONTEND=noninteractive
