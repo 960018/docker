@@ -12,7 +12,8 @@ USER    root
 
 RUN     \
         set -eux \
-&&      chown -R vairogs:vairogs /app
+&&      chown -R vairogs:vairogs /app \
+&&      yarn
 
 USER    vairogs
 
