@@ -1,5 +1,6 @@
 import express from "express";
 import {createServer} from "http";
+import sanitizeHtml from 'sanitize-html';
 
 const app = express();
 
@@ -7,6 +8,10 @@ app.set("trust proxy", ["loopback", "linklocal", "uniquelocal"]);
 
 app.all("*", (req, res) => {
     let ip = req.headers["cf-connecting-ip"];
+    ip = sanitizeHtml(ip, {
+        allowedTags: [],
+        allowedAttributes: {}
+    });
     app.set("title", ip);
     res.send(ip);
 });
