@@ -73,6 +73,7 @@ docker pull debian:sid-slim || exit
 docker pull nginx:1.26-bookworm || exit
 docker pull "node:${NODE21}-bookworm-slim" || exit
 docker pull "node:${NODE18}-bookworm-slim" || exit
+docker pull "node:${NODE22}-bookworm-slim" || exit
 docker pull oven/bun:canary || exit
 docker pull moby/buildkit:master-rootless || exit
 docker pull "varnish:${VARNISH}" || exit

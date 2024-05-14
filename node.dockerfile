@@ -47,15 +47,9 @@ RUN     \
             /root/.npm \
             /root/.cache \
 &&      usermod -a -G dialout vairogs \
-&&      npm i -g npm@next-10 \
-&&      npm i -g pnpm
+&&      npm i -g npm@next-10
 
 USER    vairogs
-
-RUN     \
-        set -eux \
-&&      curl https://bun.sh/install | bash \
-&&      /home/vairogs/.bun/bin/bun upgrade --canary
 
 FROM    ghcr.io/960018/scratch:latest
 
@@ -65,6 +59,7 @@ ARG     VERSION
 
 ENV     NODE_VERSION=${VERSION}
 ENV     YARN_VERSION=1.22.19
+ENV     NODE_COMPILE_CACHE=/home/vairogs/.node_cache
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 

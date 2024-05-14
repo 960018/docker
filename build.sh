@@ -32,12 +32,13 @@ docker buildx build --tag ghcr.io/960018/keydb:$ARCH                ${BOP} -f ke
 
 docker buildx build --tag ghcr.io/960018/bun:$ARCH                  ${BOP} -f bun.dockerfile .                                                        || exit
 
+docker buildx build --tag ghcr.io/960018/node:22-$ARCH              ${BOP} -f node.dockerfile --build-arg VERSION=$NODE22 .                           || exit
 docker buildx build --tag ghcr.io/960018/node:21-$ARCH              ${BOP} -f node.dockerfile --build-arg VERSION=$NODE21 .                           || exit
 docker buildx build --tag ghcr.io/960018/node:18-$ARCH              ${BOP} -f node.dockerfile --build-arg VERSION=$NODE18 .                           || exit
 
-docker pull ghcr.io/960018/node:21-$ARCH                                                                                                              || exit
-docker buildx build --tag ghcr.io/960018/node:21-$ARCH-ip           ${BOP} -f node.script.dockerfile --build-arg ARCH=$ARCH --build-arg SCRIPT=ip .   || exit
-docker buildx build --tag ghcr.io/960018/node:21-$ARCH-echo         ${BOP} -f node.script.dockerfile --build-arg ARCH=$ARCH --build-arg SCRIPT=echo . || exit
+docker pull ghcr.io/960018/node:22-$ARCH                                                                                                              || exit
+docker buildx build --tag ghcr.io/960018/node:22-$ARCH-ip           ${BOP} -f node.script.dockerfile --build-arg ARCH=$ARCH --build-arg SCRIPT=ip .   || exit
+docker buildx build --tag ghcr.io/960018/node:22-$ARCH-echo         ${BOP} -f node.script.dockerfile --build-arg ARCH=$ARCH --build-arg SCRIPT=echo . || exit
 
 docker buildx build --tag ghcr.io/960018/curl:$ARCH                 ${BOP} -f curl.dockerfile .                                                       || exit
 docker pull ghcr.io/960018/curl:$ARCH                                                                                                                 || exit

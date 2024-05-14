@@ -1,6 +1,6 @@
 ARG ARCH
 
-FROM    ghcr.io/960018/node:21-${ARCH} AS builder
+FROM    ghcr.io/960018/node:22-${ARCH} AS builder
 
 ARG     SCRIPT
 
@@ -19,7 +19,7 @@ USER    vairogs
 
 ARG ARCH
 
-FROM    ghcr.io/960018/node:21-${ARCH}
+FROM    ghcr.io/960018/node:22-${ARCH}
 
 WORKDIR /app
 
