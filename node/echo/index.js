@@ -10,7 +10,7 @@ const app = express();
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 app.set("json spaces", 4);
-app.set("trust proxy", ["loopback", "linklocal", "uniquelocal"]);
+app.set("trust proxy", true);
 
 app.use(morgan("combined"));
 
