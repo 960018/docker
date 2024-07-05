@@ -1,4 +1,4 @@
-FROM    oven/bun:canary AS builder
+FROM    oven/bun:canary-debian AS builder
 
 ENV     container=docker
 ENV     DEBIAN_FRONTEND=noninteractive
@@ -48,6 +48,12 @@ RUN     \
 USER    vairogs
 
 FROM    ghcr.io/960018/scratch:latest
+
+ARG BUN_RUNTIME_TRANSPILER_CACHE_PATH=0
+ENV BUN_RUNTIME_TRANSPILER_CACHE_PATH=${BUN_RUNTIME_TRANSPILER_CACHE_PATH}
+
+ARG BUN_INSTALL_BIN=/usr/local/bin
+ENV BUN_INSTALL_BIN=${BUN_INSTALL_BIN}
 
 COPY    --from=builder / /
 

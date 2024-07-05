@@ -8,11 +8,13 @@ pg/
 php/clone/*
 php/source/
 php/src/
+php/install-php-extensions
 portainer/
 postgres13/
 postgres14/
 postgres15/
 postgres16/
+postgres17/
 traefik/log/
 !curl/clone/*.txt
 !curl/clone/.gitignore

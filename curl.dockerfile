@@ -28,7 +28,7 @@ RUN     \
         set -eux \
 &&      apt-get update \
 &&      apt-get upgrade -y \
-&&      apt-get install -y --no-install-recommends vim-tiny tzdata bash ca-certificates procps iputils-ping telnet unzip apt-utils \
+&&      apt-get install -y --no-install-recommends vim-tiny tzdata bash ca-certificates procps iputils-ping telnet unzip apt-utils pkg-config \
 &&      echo 'alias ll="ls -lahs"' >> /home/vairogs/.bashrc \
 &&      echo 'alias ll="ls -lahs"' >> /root/.bashrc \
 &&      chown vairogs:vairogs /usr/local/bin/wait-for-it \
@@ -47,34 +47,38 @@ RUN     \
 &&      apt-get update \
 &&      apt-get upgrade -y \
 &&      apt-get install -y --no-install-recommends make automake autoconf libtool ca-certificates gcc g++ libbrotli1 libbrotli-dev zstd libzstd-dev librtmp-dev librtmp1 rtmpdump pkg-config \
-        libgsasl-dev libgsasl18 libpsl-dev perl libnghttp2-dev nghttp2 libssl-dev libssl3t64 \
+        libgsasl-dev libgsasl18 libpsl-dev perl libnghttp2-dev nghttp2 libssl-dev libssl3t64 libpsl5t64 \
 &&      cd  nghttp3 \
 &&      autoreconf -fi \
-&&      ./configure --prefix=/opt/nghttp3 --enable-lib-only \
+&&      ./configure --prefix=/usr/local --enable-lib-only \
 &&      make \
 &&      make install \
 &&      cd ../wolfssl \
 &&      autoreconf -fi \
-&&      ./configure --prefix=/opt/wolfssl --enable-session-ticket --enable-earlydata --enable-psk --enable-altcertchains --disable-examples \
-            --enable-dtl --enable-sctp --enable-opensslextra --enable-opensslall --enable-sniffer --enable-sha512 --enable-ed25519 --enable-rsapss --enable-base64encode --enable-tlsx \
-            --enable-scrypt --disable-crypttests --enable-fast-rsa --enable-fastmath --enable-harden --enable-quic --enable-all \
+&&      ./configure --enable-session-ticket --enable-earlydata --enable-psk --enable-altcertchains --disable-examples \
+            --enable-dtls --enable-sctp --enable-opensslextra --enable-opensslall --enable-sniffer --enable-sha512 --enable-ed25519 --enable-rsapss --enable-base64encode --enable-tlsx \
+            --enable-scrypt --disable-crypttests --enable-fastmath --enable-harden --enable-quic --enable-all --enable-experimental \
 &&      make \
 &&      make install \
 &&      cd ../ngtcp2 \
 &&      autoreconf -fi \
-&&      ./configure PKG_CONFIG_PATH=/opt/wolfssl/lib/pkgconfig:/opt/nghttp3/lib/pkgconfig LDFLAGS="-Wl,-rpath,/opt/wolfssl/lib" --prefix=/opt/ngtcp2 --enable-lib-only --with-wolfssl \
+&&      ./configure LDFLAGS="-Wl,-rpath,/usr/local/lib" --prefix=/usr/local --with-wolfssl --enable-lib-only \
 &&      make \
 &&      make install \
 &&      cd ../curl \
 &&      autoreconf -fi \
-&&      ./configure CFLAGS='-fstack-protector-strong -fpic -fpie -O3 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native -mcpu=native' \
-            --with-wolfssl=/opt/wolfssl --with-zlib --with-brotli --enable-ipv6 --with-libidn2 --enable-sspi --with-librtmp --with-ngtcp2=/opt/ngtcp2 --with-nghttp3=/opt/nghttp3 --with-nghttp2 --enable-websockets --with-zstd --with-psl --disable-manual \
+&&      ./configure CFLAGS='-fstack-protector-strong -fpic -fpie -O3 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native -mcpu=native' --prefix=/usr/local \
+            --with-wolfssl --with-zlib --with-brotli --enable-ipv6 --with-libidn2 --enable-sspi --with-librtmp --with-ngtcp2 --with-nghttp3 --with-nghttp2 --enable-websockets --with-zstd --disable-manual --disable-docs \
+            --enable-ech \
 &&      make \
 &&      make install \
 &&      apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false libbrotli-dev git cmake make automake autoconf libtool gcc g++ libzstd-dev libssl-dev librtmp-dev krb5-multidev libcrypt-dev libnsl-dev libtirpc-dev linux-libc-dev comerr-dev perl libnghttp3-dev \
             libnghttp2-dev libgsasl-dev libgssglue-dev libidn-dev libidn11-dev libntlm0-dev libpsl-dev curl libcurl4 libgss-dev \
 &&      apt-get autoremove -y --purge \
 &&      ldconfig \
+&&      sed -i 's/Requires.private/Requires/' /usr/local/lib/pkgconfig/libcurl.pc \
+&&      sed -i '0,/^Requires:.*$/s///' /usr/local/lib/pkgconfig/libcurl.pc \
+&&      sed -i '/^Libs:/ { N; s/\nLibs\.private: / /; }' /usr/local/lib/pkgconfig/libcurl.pc \
 &&      rm -rf \
             /home/vairogs/curl \
             /home/vairogs/wolfssl \

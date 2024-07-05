@@ -6,11 +6,11 @@ ARG     ARCH
 
 USER    root
 
-ENV     PHP_VERSION 8.4.0-dev
-ENV     PHP_INI_DIR /usr/local/etc/php
-ENV     PHP_CFLAGS "-fstack-protector-strong -fpic -fpie -O3 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native -mcpu=native"
-ENV     PHP_CPPFLAGS "$PHP_CFLAGS"
-ENV     PHP_LDFLAGS "-Wl,-O3 -pie"
+ENV     PHP_VERSION=8.4.0-dev
+ENV     PHP_INI_DIR=/usr/local/etc/php
+ENV     PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O3 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native -mcpu=native"
+ENV     PHP_CPPFLAGS="$PHP_CFLAGS"
+ENV     PHP_LDFLAGS="-Wl,-O3 -pie"
 
 COPY    php/no-debian-php /etc/apt/preferences.d/no-debian-php
 COPY    php/src/          /usr/src/php
@@ -20,9 +20,8 @@ COPY    php/docker/docker-php-ext-configure /usr/local/bin/docker-php-ext-config
 COPY    php/docker/docker-php-ext-enable    /usr/local/bin/docker-php-ext-enable
 COPY    php/docker/docker-php-ext-install   /usr/local/bin/docker-php-ext-install
 COPY    php/docker/docker-php-source        /usr/local/bin/docker-php-source
-
-COPY    --from=mlocati/php-extension-installer:latest /usr/bin/install-php-extensions /usr/local/bin/
-COPY    --from=composer:latest                        /usr/bin/composer /usr/bin/
+COPY    php/install-php-extensions          /usr/local/bin/install-php-extensions
+COPY    --from=composer:latest              /usr/bin/composer /usr/bin/
 
 ENTRYPOINT ["docker-php-entrypoint"]
 
@@ -34,13 +33,12 @@ RUN     \
         set -eux \
 &&      apt-get update \
 &&      apt-get upgrade -y \
-&&      apt-get install -y --no-install-recommends --allow-downgrades make libc-dev libc6-dev gcc g++ cpp bison git autoconf dpkg-dev dpkg re2c libxml2-dev libxml2 libsqlite3-dev libsqlite3-0 xz-utils libargon2-dev libargon2-1 \
-            libonig-dev libonig5 libreadline-dev libreadline8t64 libsodium-dev libsodium23 zlib1g-dev zlib1g libbz2-dev libbz2-1.0 libgmp-dev libgmp10 libedit-dev libedit2 libtidy-dev libtidy5deb1 libnghttp3-dev libnghttp3-3 \
+&&      apt-get install -y --no-install-recommends --allow-downgrades make libc-dev libc6-dev gcc g++ cpp bison git dpkg-dev autoconf re2c libxml2-dev libxml2 libsqlite3-dev libsqlite3-0 xz-utils libargon2-dev libargon2-1 \
+            libonig-dev libonig5 libreadline-dev libreadline8t64 libsodium-dev libsodium23 zlib1g-dev zlib1g libbz2-dev libbz2-1.0 libgmp-dev libgmp10 libedit-dev libedit2 libtidy-dev libtidy5deb1 libnghttp3-dev libnghttp3-9 \
             libnghttp2-dev nghttp2 idn2 libidn2-0 librtmp-dev librtmp1 rtmpdump libgsasl-dev libgsasl18 libpsl-dev libpsl5t64 zstd libzstd-dev libbrotli1 libbrotli-dev libjpeg62-turbo libjpeg62-turbo-dev libpng16-16t64 libpng-dev \
             libwebp7 libwebp-dev libfreetype-dev libfreetype6 liblzf-dev liblzf1 liblzf-dev liblzf1 liblz4-dev liblzf-dev liblz4-1 gdb-minimal libfcgi-bin wget cron libssl-dev libssl3t64 libhiredis1.1.0 libhiredis-dev libpq5 libpq-dev \
             libzip4t64 libzip-dev libmagickwand-6.q16-dev libmagickwand-6.q16-7t64 libmagickcore-6.q16-7t64 libmagickcore-6.q16-dev libevent-2.1-7t64 libevent-dev \
 &&      chmod -R 1777 /usr/local/bin \
-&&      chmod 1777 /home/vairogs/installer \
 &&      mkdir --parents "$PHP_INI_DIR/conf.d" \
 &&      [ ! -d /var/www/html ]; \
         mkdir --parents /var/www/html \
@@ -113,16 +111,39 @@ RUN     \
 &&      chmod -R 1777 /usr/local/bin \
 &&      docker-php-ext-enable sodium \
 &&      mkdir --parents --mode=777 --verbose /run/php-fpm \
-&&      mkdir --parents /var/www/html/config \
 &&      touch /run/php-fpm/.keep_dir \
-&&      composer self-update --snapshot
+&&      composer self-update --snapshot \
+&&      mkdir --parents /home/vairogs/extensions
+
+COPY    php/clone/phpredissrc/ /home/vairogs/extensions/phpredis/
+COPY    php/clone/phpiredissrc/ /home/vairogs/extensions/phpiredis/
+COPY    php/clone/imagicksrc/ /home/vairogs/extensions/imagick/
+COPY    php/clone/apcusrc/ /home/vairogs/extensions/apcu/
+COPY    php/clone/pecl-eventsrc/ /home/vairogs/extensions/pecl-event/
+COPY    php/clone/ext-dssrc/ /home/vairogs/extensions/ext-ds/
+COPY    php/clone/php_zipsrc/ /home/vairogs/extensions/php_zip/
+
+WORKDIR /home/vairogs/extensions
 
 RUN     \
         set -eux \
+&&      chmod -R 1777 /usr/local/bin \
 &&      export CFLAGS="$PHP_CFLAGS" CPPFLAGS="$PHP_CPPFLAGS" LDFLAGS="$PHP_LDFLAGS" PHP_BUILD_PROVIDER='https://github.com/960018/docker' PHP_UNAME="Linux (${ARCH}) - Docker" \
 &&      docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ --with-webp=/usr/include/ \
 &&      docker-php-ext-install gd \
 &&      docker-php-ext-enable gd
+
+RUN     \
+        set -eux \
+&&      ( \
+            cd  apcu \
+            &&  phpize \
+            &&  ./configure --enable-apcu \
+            &&  make \
+            &&  make install \
+            &&  cd .. || exit \
+        ) \
+&&      docker-php-ext-enable apcu
 
 #&&      install-php-extensions krakjoe/apcu@master \
 #&&      install-php-extensions php-decimal/ext-decimal@master \
@@ -178,20 +199,9 @@ RUN     \
 
 RUN     \
         set -eux \
-&&      mkdir --parents /home/vairogs/extensions \
 &&      wget -O /usr/local/bin/php-fpm-healthcheck https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/master/php-fpm-healthcheck \
 &&      chmod +x /usr/local/bin/php-fpm-healthcheck \
 &&      chown www-data:www-data /usr/local/bin/php-fpm-healthcheck
-
-COPY    php/clone/phpredissrc/ /home/vairogs/extensions/phpredis/
-COPY    php/clone/phpiredissrc/ /home/vairogs/extensions/phpiredis/
-COPY    php/clone/imagicksrc/ /home/vairogs/extensions/imagick/
-COPY    php/clone/apcusrc/ /home/vairogs/extensions/apcu/
-COPY    php/clone/pecl-eventsrc/ /home/vairogs/extensions/pecl-event/
-COPY    php/clone/ext-dssrc/ /home/vairogs/extensions/ext-ds/
-COPY    php/clone/php_zipsrc/ /home/vairogs/extensions/php_zip/
-
-WORKDIR /home/vairogs/extensions
 
 RUN     \
         set -eux \
@@ -231,15 +241,6 @@ RUN     \
             &&  cd .. || exit \
         ) \
 &&      docker-php-ext-enable imagick \
-&&      ( \
-            cd  apcu \
-            &&  phpize \
-            &&  ./configure --enable-apcu \
-            &&  make \
-            &&  make install \
-            &&  cd .. || exit \
-        ) \
-&&      docker-php-ext-enable apcu \
 &&      ( \
             cd  ext-ds \
             &&  phpize \
@@ -318,12 +319,12 @@ FROM    ghcr.io/960018/scratch:latest
 
 COPY    --from=builder / /
 
-ENV     PHP_VERSION 8.4.0-dev
-ENV     PHP_INI_DIR /usr/local/etc/php
-ENV     PHP_CFLAGS "-fstack-protector-strong -fpic -fpie -O3 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native -mcpu=native"
-ENV     PHP_CPPFLAGS "$PHP_CFLAGS"
-ENV     PHP_LDFLAGS "-Wl,-O3 -pie"
-ENV     PHP_CS_FIXER_IGNORE_ENV 1
+ENV     PHP_VERSION=8.4.0-dev
+ENV     PHP_INI_DIR=/usr/local/etc/php
+ENV     PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O3 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native -mcpu=native"
+ENV     PHP_CPPFLAGS="$PHP_CFLAGS"
+ENV     PHP_LDFLAGS="-Wl,-O3 -pie"
+ENV     PHP_CS_FIXER_IGNORE_ENV=1
 
 STOPSIGNAL SIGQUIT
 

@@ -4,11 +4,11 @@ FROM    ghcr.io/960018/php-fpm:${ARCH} AS builder
 
 USER    root
 
-ENV     PHP_VERSION 8.4.0-dev
-ENV     PHP_INI_DIR /usr/local/etc/php
-ENV     PHP_CFLAGS "-fstack-protector-strong -fpic -fpie -O3 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native -mcpu=native"
-ENV     PHP_CPPFLAGS "$PHP_CFLAGS"
-ENV     PHP_LDFLAGS "-Wl,-O3 -pie"
+ENV     PHP_VERSION=8.4.0-dev
+ENV     PHP_INI_DIR=/usr/local/etc/php
+ENV     PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O3 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native -mcpu=native"
+ENV     PHP_CPPFLAGS="$PHP_CFLAGS"
+ENV     PHP_LDFLAGS="-Wl,-O3 -pie"
 
 COPY    php/docker/docker-php-ext-enable /usr/local/bin/docker-php-ext-enable
 
@@ -39,15 +39,15 @@ RUN     \
             &&  cd .. || exit \
         ) \
 &&      docker-php-ext-enable xdebug \
-#&&      ( \
-#             cd  runkit7 \
-#             &&  phpize \
-#             &&  ./configure \
-#             &&  make \
-#             &&  make install \
-#             &&  cd .. || exit \
-#         ) \
-#&&      docker-php-ext-enable runkit7 \
+&&      ( \
+             cd  runkit7 \
+             &&  phpize \
+             &&  ./configure \
+             &&  make \
+             &&  make install \
+             &&  cd .. || exit \
+         ) \
+&&      docker-php-ext-enable runkit7 \
 &&      ( \
              cd  php-spx \
              &&  phpize \
@@ -109,19 +109,19 @@ USER    vairogs
 
 CMD     ["sh", "-c", "cron && php-fpm"]
 
-FROM    ghcr.io/960018/node:21-${ARCH} as node
+FROM    ghcr.io/960018/node:21-${ARCH} AS node
 FROM    ghcr.io/960018/scratch:latest
 
 COPY    --from=builder / /
 COPY    --from=node /usr/local/bin/node /usr/local/bin
 COPY    --from=node /usr/local/bin/yarn /usr/local/bin
 
-ENV     PHP_VERSION 8.4.0-dev
-ENV     PHP_INI_DIR /usr/local/etc/php
-ENV     PHP_CFLAGS "-fstack-protector-strong -fpic -fpie -O3 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native -mcpu=native"
-ENV     PHP_CPPFLAGS "$PHP_CFLAGS"
-ENV     PHP_LDFLAGS "-Wl,-O3 -pie"
-ENV     PHP_CS_FIXER_IGNORE_ENV 1
+ENV     PHP_VERSION=8.4.0-dev
+ENV     PHP_INI_DIR=/usr/local/etc/php
+ENV     PHP_CFLAGS="-fstack-protector-strong -fpic -fpie -O3 -ftree-vectorize -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -march=native -mcpu=native"
+ENV     PHP_CPPFLAGS="$PHP_CFLAGS"
+ENV     PHP_LDFLAGS="-Wl,-O3 -pie"
+ENV     PHP_CS_FIXER_IGNORE_ENV=1
 
 STOPSIGNAL SIGQUIT
 
@@ -134,4 +134,5 @@ RUN     \
 &&      git config --global --add safe.directory "*"
 
 ENTRYPOINT ["docker-php-entrypoint"]
+
 CMD     ["sh", "-c", "cron && php-fpm"]

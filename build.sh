@@ -15,7 +15,7 @@ case $PLATFORM in
 esac
 
 export ARCH
-export BOP="--push --compress --no-cache --shm-size=2gb --provenance=true --sbom=true --builder=master --progress plain --platform=linux/${ARCH} --pull=false"
+export BOP="--push --compress --no-cache --shm-size=2gb --provenance=true --sbom=true --builder=master --progress plain --platform=linux/${ARCH}"
 
 source .env
 
@@ -26,15 +26,13 @@ docker rm -f buildx_buildkit_master0                                            
 docker buildx build --tag ghcr.io/960018/scratch:latest             ${BOP} -f scratch.dockerfile .                                                    || exit
 docker pull ghcr.io/960018/scratch:latest                                                                                                             || exit
 
-docker buildx build --tag ghcr.io/960018/nginx:$ARCH                ${BOP} -f nginx.dockerfile .                                                      || exit
+docker buildx build --tag ghcr.io/960018/nginx:$ARCH                ${BOP} -f nginx.dockerfile --build-arg VERSION=$NGINX .                           || exit
 
 docker buildx build --tag ghcr.io/960018/keydb:$ARCH                ${BOP} -f keydb.dockerfile .                                                      || exit
 
 docker buildx build --tag ghcr.io/960018/bun:$ARCH                  ${BOP} -f bun.dockerfile .                                                        || exit
 
 docker buildx build --tag ghcr.io/960018/node:22-$ARCH              ${BOP} -f node.dockerfile --build-arg VERSION=$NODE22 .                           || exit
-docker buildx build --tag ghcr.io/960018/node:21-$ARCH              ${BOP} -f node.dockerfile --build-arg VERSION=$NODE21 .                           || exit
-docker buildx build --tag ghcr.io/960018/node:18-$ARCH              ${BOP} -f node.dockerfile --build-arg VERSION=$NODE18 .                           || exit
 
 docker pull ghcr.io/960018/node:22-$ARCH                                                                                                              || exit
 docker buildx build --tag ghcr.io/960018/node:22-$ARCH-ip           ${BOP} -f node.script.dockerfile --build-arg ARCH=$ARCH --build-arg SCRIPT=ip .   || exit

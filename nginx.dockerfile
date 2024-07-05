@@ -1,4 +1,6 @@
-FROM    nginx:1.26-bookworm AS builder
+ARG     VERSION
+
+FROM    nginx:${VERSION} AS builder
 
 ENV     container=docker
 ENV     DEBIAN_FRONTEND=noninteractive
@@ -20,6 +22,7 @@ RUN     \
 &&      usermod -u 1000 vairogs \
 &&      groupmod -g 1000 vairogs \
 &&      mkdir --parents /home/vairogs \
+&&      mkdir --parents /etc/nginx/stream.d \
 &&      echo >> /home/vairogs/.bashrc \
 &&      echo 'alias ll="ls -lahs"' >> /home/vairogs/.bashrc \
 &&      echo 'alias ll="ls -lahs"' >> /root/.bashrc \
@@ -43,6 +46,7 @@ RUN     \
 &&      chown -R vairogs:vairogs /var/cache/nginx \
 &&      chown -R vairogs:vairogs /var/log/nginx \
 &&      chown -R vairogs:vairogs /etc/nginx/conf.d \
+&&      chown -R vairogs:vairogs /etc/nginx/stream.d \
 &&      touch /var/run/nginx.pid \
 &&      chown -R vairogs:vairogs /var/run/nginx.pid \
 &&      usermod -a -G dialout vairogs
@@ -66,4 +70,5 @@ EXPOSE  443/udp
 WORKDIR /var/www/html
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
+
 CMD     ["nginx", "-g", "daemon off;"]

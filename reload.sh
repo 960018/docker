@@ -26,8 +26,10 @@ docker pull "postgres:$POSTGRES13" || exit
 docker pull "postgres:$POSTGRES14" || exit
 docker pull "postgres:$POSTGRES15" || exit
 docker pull "postgres:$POSTGRES16" || exit
+docker pull "postgres:$POSTGRES17" || exit
 docker pull "memcached:$MEMCACHED" || exit
 docker pull "bash:devel" || exit
+docker pull "justarchi/archisteamfarm:released" || exit
 
 if [ -z $(docker network ls --filter name=^frontend$ --format="{{ .Name }}") ]; then
     docker network create frontend;
@@ -37,7 +39,7 @@ if [ -z $(docker network ls --filter name=^backend$ --format="{{ .Name }}") ]; t
     docker network create backend;
 fi
 
-dirs=("socks" "postgres13" "postgres14" "postgres15" "postgres16" "pgr13")
+dirs=("socks" "postgres13" "postgres14" "postgres15" "postgres16" "postgres17")
 
 for i in "${dirs[@]}"
 do

@@ -17,6 +17,9 @@ cd .. || exit
 cd .. || exit
 
 cd php || exit
+
+wget -cN "https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions"
+
 rm -rf source src
 eval "$(cat php.txt)"
 cd clone || exit

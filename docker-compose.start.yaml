@@ -21,7 +21,7 @@ volumes:
         external: true
     postgres16:
         external: true
-    pgr13:
+    postgres17:
         external: true
 
 x-variables: &x-variables
@@ -39,10 +39,10 @@ services:
         image: traefik:${TRAEFIK}
         container_name: traefik
         ports:
-            - 127.0.0.1:80:80
-            - 127.0.0.1:443:443/tcp
-            - 127.0.0.1:443:443/udp
-            - 127.0.0.1:8080:8080
+            - "127.0.0.1:80:80"
+            - "127.0.0.1:443:443/tcp"
+            - "127.0.0.1:443:443/udp"
+            - "127.0.0.1:8080:8080"
         networks:
             - frontend
             - backend
@@ -60,7 +60,9 @@ services:
             - --providers.docker.exposedbydefault=false
             - --providers.docker.network=frontend
             - --accessLog
-            - --accessLog.filePath=/etc/traefik/log/access.log
+            - --accessLog.filePath=/etc/traefik/log/access.json
+            - --accesslog.bufferingsize=100
+            - --accesslog.format=json
             - --log.filePath=/etc/traefik/log/error.log
             - --providers.file.directory=/dynamic_conf
             - --providers.file.filename=/dynamic_conf/traefik_dynamic.yml
@@ -127,7 +129,7 @@ services:
         volumes:
             - *x-sock
         ports:
-            - 127.0.0.1:6379:6379
+            - "127.0.0.1:6379:6379"
         mem_limit: 64m
         tmpfs: /tmp
         depends_on:
@@ -152,7 +154,7 @@ services:
         networks:
             - backend
         ports:
-            - 127.0.0.1:5433:5432
+            - "127.0.0.1:5433:5432"
         mem_limit: 512m
         shm_size: 256m
         tmpfs: /tmp
@@ -176,7 +178,7 @@ services:
         networks:
             - backend
         ports:
-            - 127.0.0.1:5434:5432
+            - "127.0.0.1:5434:5432"
         mem_limit: 512m
         shm_size: 256m
         tmpfs: /tmp
@@ -200,7 +202,7 @@ services:
         networks:
             - backend
         ports:
-            - 127.0.0.1:5435:5432
+            - "127.0.0.1:5435:5432"
         mem_limit: 256m
         shm_size: 256m
         tmpfs: /tmp
@@ -224,7 +226,7 @@ services:
         networks:
             - backend
         ports:
-            - 127.0.0.1:5436:5432
+            - "127.0.0.1:5436:5432"
         mem_limit: 512m
         shm_size: 256m
         tmpfs: /tmp
@@ -235,11 +237,35 @@ services:
             retries: 5
         profiles: ["full"]
 
+    postgres17:
+        image: postgres:${POSTGRES17}
+        container_name: postgres17
+        environment:
+            <<: *x-variables
+        volumes:
+            - ./postgres17:/var/lib/postgresql/data
+            - *x-pg-data
+            - postgres17:/var/run
+        restart: always
+        networks:
+            - backend
+        ports:
+            - "127.0.0.1:5437:5432"
+        mem_limit: 512m
+        shm_size: 256m
+        tmpfs: /tmp
+        healthcheck:
+            test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+        profiles: [ "full" ]
+
     memcached:
         image: memcached:${MEMCACHED}
         container_name: memcached
         ports:
-            - 127.0.0.1:11211:11211
+            - "127.0.0.1:11211:11211"
         networks:
             - backend
         mem_limit: 128m

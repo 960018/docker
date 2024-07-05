@@ -35,6 +35,9 @@ cd .. || exit
 cd .. || exit
 
 cd php || exit
+
+wget -cN "https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions"
+
 rm -rf src
 cd source || exit
 git reset --hard; 
@@ -66,13 +69,10 @@ done
 cd .. || exit
 cd .. || exit
 
-docker pull mlocati/php-extension-installer:latest || exit
 docker pull composer:latest || exit
 docker pull eqalpha/keydb:latest || exit
 docker pull debian:sid-slim || exit
-docker pull nginx:1.26-bookworm || exit
-docker pull "node:${NODE21}-bookworm-slim" || exit
-docker pull "node:${NODE18}-bookworm-slim" || exit
+docker pull "nginx:${NGINX}" || exit
 docker pull "node:${NODE22}-bookworm-slim" || exit
 docker pull oven/bun:canary || exit
 docker pull moby/buildkit:master-rootless || exit
