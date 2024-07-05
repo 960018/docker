@@ -1,3 +1,5 @@
+ARG     ARCH
+
 FROM    eqalpha/keydb:latest AS builder
 
 ENV     container=docker
@@ -53,7 +55,7 @@ RUN     \
 
 USER    vairogs
 
-FROM    ghcr.io/960018/scratch:latest
+FROM    ghcr.io/960018/scratch:${ARCH}
 
 COPY    --from=builder / /
 

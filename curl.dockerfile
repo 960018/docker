@@ -1,3 +1,5 @@
+ARG     ARCH
+
 FROM    debian:sid-slim AS builder
 
 LABEL   maintainer="support+docker@vairogs.com"
@@ -98,7 +100,7 @@ USER    vairogs
 
 CMD     ["/bin/bash"]
 
-FROM    ghcr.io/960018/scratch:latest
+FROM    ghcr.io/960018/scratch:${ARCH}
 
 COPY    --from=builder / /
 

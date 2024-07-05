@@ -1,3 +1,5 @@
+ARG     ARCH
+
 FROM    oven/bun:canary-debian AS builder
 
 ENV     container=docker
@@ -47,7 +49,7 @@ RUN     \
 
 USER    vairogs
 
-FROM    ghcr.io/960018/scratch:latest
+FROM    ghcr.io/960018/scratch:${ARCH}
 
 ARG BUN_RUNTIME_TRANSPILER_CACHE_PATH=0
 ENV BUN_RUNTIME_TRANSPILER_CACHE_PATH=${BUN_RUNTIME_TRANSPILER_CACHE_PATH}

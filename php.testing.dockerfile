@@ -110,7 +110,7 @@ USER    vairogs
 CMD     ["sh", "-c", "cron && php-fpm"]
 
 FROM    ghcr.io/960018/node:21-${ARCH} AS node
-FROM    ghcr.io/960018/scratch:latest
+FROM    ghcr.io/960018/scratch:${ARCH}
 
 COPY    --from=builder / /
 COPY    --from=node /usr/local/bin/node /usr/local/bin

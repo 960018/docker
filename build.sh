@@ -23,22 +23,22 @@ docker login ghcr.io -u "$CR_USER" --password "$CR_PAT"                         
 
 docker rm -f buildx_buildkit_master0                                                                                                                  || exit
 
-docker buildx build --tag ghcr.io/960018/scratch:latest             ${BOP} -f scratch.dockerfile .                                                    || exit
-docker pull ghcr.io/960018/scratch:latest                                                                                                             || exit
+docker buildx build --tag ghcr.io/960018/scratch:$ARCH              ${BOP} -f scratch.dockerfile .                                                    || exit
+docker pull ghcr.io/960018/scratch:$ARCH                                                                                                              || exit
 
-docker buildx build --tag ghcr.io/960018/nginx:$ARCH                ${BOP} -f nginx.dockerfile --build-arg VERSION=$NGINX .                           || exit
+docker buildx build --tag ghcr.io/960018/nginx:$ARCH                ${BOP} -f nginx.dockerfile --build-arg ARCH=$ARCH --build-arg VERSION=$NGINX .    || exit
 
-docker buildx build --tag ghcr.io/960018/keydb:$ARCH                ${BOP} -f keydb.dockerfile .                                                      || exit
+docker buildx build --tag ghcr.io/960018/keydb:$ARCH                ${BOP} -f keydb.dockerfile --build-arg ARCH=$ARCH .                               || exit
 
-docker buildx build --tag ghcr.io/960018/bun:$ARCH                  ${BOP} -f bun.dockerfile .                                                        || exit
+docker buildx build --tag ghcr.io/960018/bun:$ARCH                  ${BOP} -f bun.dockerfile --build-arg ARCH=$ARCH .                                 || exit
 
-docker buildx build --tag ghcr.io/960018/node:22-$ARCH              ${BOP} -f node.dockerfile --build-arg VERSION=$NODE22 .                           || exit
+docker buildx build --tag ghcr.io/960018/node:22-$ARCH              ${BOP} -f node.dockerfile --build-arg VERSION=$NODE22 --build-arg ARCH=$ARCH .    || exit
 
 docker pull ghcr.io/960018/node:22-$ARCH                                                                                                              || exit
 docker buildx build --tag ghcr.io/960018/node:22-$ARCH-ip           ${BOP} -f node.script.dockerfile --build-arg ARCH=$ARCH --build-arg SCRIPT=ip .   || exit
 docker buildx build --tag ghcr.io/960018/node:22-$ARCH-echo         ${BOP} -f node.script.dockerfile --build-arg ARCH=$ARCH --build-arg SCRIPT=echo . || exit
 
-docker buildx build --tag ghcr.io/960018/curl:$ARCH                 ${BOP} -f curl.dockerfile .                                                       || exit
+docker buildx build --tag ghcr.io/960018/curl:$ARCH                 ${BOP} -f curl.dockerfile --build-arg ARCH=$ARCH .                                || exit
 docker pull ghcr.io/960018/curl:$ARCH                                                                                                                 || exit
 
 docker buildx build --tag ghcr.io/960018/php-fpm:$ARCH              ${BOP} -f php.dockerfile --build-arg ARCH=$ARCH .                                 || exit

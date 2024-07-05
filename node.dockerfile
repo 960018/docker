@@ -1,4 +1,5 @@
 ARG     VERSION
+ARG     ARCH
 
 FROM    node:${VERSION}-bookworm-slim AS builder
 
@@ -51,7 +52,7 @@ RUN     \
 
 USER    vairogs
 
-FROM    ghcr.io/960018/scratch:latest
+FROM    ghcr.io/960018/scratch:${ARCH}
 
 COPY    --from=builder / /
 

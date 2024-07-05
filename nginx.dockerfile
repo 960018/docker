@@ -1,4 +1,5 @@
 ARG     VERSION
+ARG     ARCH
 
 FROM    nginx:${VERSION} AS builder
 
@@ -57,7 +58,7 @@ WORKDIR /var/www/html
 
 USER    vairogs
 
-FROM    ghcr.io/960018/scratch:latest
+FROM    ghcr.io/960018/scratch:${ARCH}
 
 COPY    --from=builder / /
 

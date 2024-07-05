@@ -315,7 +315,7 @@ USER    vairogs
 
 CMD     ["sh", "-c", "cron && php-fpm"]
 
-FROM    ghcr.io/960018/scratch:latest
+FROM    ghcr.io/960018/scratch:${ARCH}
 
 COPY    --from=builder / /
 
