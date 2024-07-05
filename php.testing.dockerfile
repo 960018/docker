@@ -109,12 +109,12 @@ USER    vairogs
 
 CMD     ["sh", "-c", "cron && php-fpm"]
 
-FROM    ghcr.io/960018/node:21-${ARCH} AS node
+FROM    ghcr.io/960018/bun:${ARCH} AS bun
 FROM    ghcr.io/960018/scratch:${ARCH}
 
 COPY    --from=builder / /
-COPY    --from=node /usr/local/bin/node /usr/local/bin
-COPY    --from=node /usr/local/bin/yarn /usr/local/bin
+COPY    --from=bun /usr/local/bin/bun /usr/local/bin
+COPY    --from=bun /usr/local/bin/bunx /usr/local/bin
 
 ENV     PHP_VERSION=8.4.0-dev
 ENV     PHP_INI_DIR=/usr/local/etc/php
