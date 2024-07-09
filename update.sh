@@ -36,7 +36,7 @@ cd .. || exit
 
 cd php || exit
 
-wget -cN "https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions"
+wget -cN "https://raw.githubusercontent.com/mlocati/docker-php-extension-installer/master/install-php-extensions"
 
 rm -rf src
 cd source || exit
