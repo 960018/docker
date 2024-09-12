@@ -18,13 +18,13 @@ cd .. || exit
 
 cd php || exit
 
-wget -cN "https://raw.githubusercontent.com/mlocati/docker-php-extension-installer/master/install-php-extensions"
+wget -N "https://raw.githubusercontent.com/960018/docker-php-extension-installer/master/install-php-extensions"
 
 rm -rf source src
 eval "$(cat php.txt)"
 cd clone || exit
 
-exts=("phpredis" "phpiredis" "runkit7" "xdebug" "php-spx" "imagick" "apcu" "ext-ds" "pecl-event" "php_zip")
+exts=("phpredis" "phpiredis" "runkit7" "xdebug" "php-spx" "imagick" "apcu" "ext-ds" "pecl-event" "php_zip" "mediawiki-php-excimer")
 
 for i in "${exts[@]}"
 do

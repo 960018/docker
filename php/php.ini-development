@@ -139,11 +139,6 @@
 ;   Development Value: 1000
 ;   Production Value: 1000
 
-; session.sid_bits_per_character
-;   Default Value: 4
-;   Development Value: 5
-;   Production Value: 5
-
 ; short_open_tag
 ;   Default Value: On
 ;   Development Value: Off
@@ -481,7 +476,7 @@ memory_limit = 1024M
 ; Development Value: E_ALL
 ; Production Value: E_ALL & ~E_DEPRECATED & ~E_STRICT
 ; https://php.net/error-reporting
-error_reporting = E_ALL
+error_reporting = E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED
 
 ; This directive controls whether or not and where PHP will output errors,
 ; notices and warnings too. Error output is very useful during development, but
@@ -498,7 +493,7 @@ error_reporting = E_ALL
 ; Development Value: On
 ; Production Value: Off
 ; https://php.net/display-errors
-display_errors = On
+display_errors = Off
 
 ; The display of errors which occur during PHP's startup sequence are handled
 ; separately from display_errors. We strongly recommend you set this to 'off'
@@ -507,7 +502,7 @@ display_errors = On
 ; Development Value: On
 ; Production Value: Off
 ; https://php.net/display-startup-errors
-display_startup_errors = On
+display_startup_errors = Off
 
 ; Besides displaying errors, PHP can also log errors to locations such as a
 ; server-specific log, STDERR, or a location specified by the error_log
@@ -1469,15 +1464,6 @@ session.cache_expire = 180
 ; https://php.net/session.use-trans-sid
 session.use_trans_sid = 0
 
-; Set session ID character length. This value could be between 22 to 256.
-; Shorter length than default is supported only for compatibility reason.
-; Users should use 32 or more chars.
-; https://php.net/session.sid-length
-; Default Value: 32
-; Development Value: 26
-; Production Value: 26
-session.sid_length = 64
-
 ; The URL rewriter will look for URLs in a defined set of HTML tags.
 ; <form> is special; if you include them here, the rewriter will
 ; add a hidden <input> field with the info which is otherwise appended
@@ -1502,18 +1488,6 @@ session.trans_sid_tags = "a=href,area=href,frame=src,form="
 ; Development Value: ""
 ; Production Value: ""
 ;session.trans_sid_hosts=""
-
-; Define how many bits are stored in each character when converting
-; the binary hash data to something readable.
-; Possible values:
-;   4  (4 bits: 0-9, a-f)
-;   5  (5 bits: 0-9, a-v)
-;   6  (6 bits: 0-9, a-z, A-Z, "-", ",")
-; Default Value: 4
-; Development Value: 5
-; Production Value: 5
-; https://php.net/session.hash-bits-per-character
-session.sid_bits_per_character = 5
 
 ; Enable upload progress tracking in $_SESSION
 ; Default Value: On

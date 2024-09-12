@@ -8,6 +8,14 @@ networks:
         name: backend
         external: true
 
+x-sock: &x-sock
+    socks:/tmp/docker/
+
+volumes:
+
+    socks:
+        external: true
+
 services:
 
     portaineragent:
@@ -45,7 +53,7 @@ services:
     mercure:
         image: dunglas/mercure:${MERCURE}
         container_name: mercure
-        command: /usr/bin/caddy run --config /etc/caddy/Caddyfile.dev
+        command: /usr/bin/caddy run --config /etc/caddy/dev.Caddyfile
         volumes:
             - ./mercure/data:/data
             - ./mercure/config:/config
@@ -68,3 +76,39 @@ services:
             SERVER_NAME: ':80'
             MERCURE_PUBLISHER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
             MERCURE_SUBSCRIBER_JWT_KEY: '!ChangeThisMercureHubJWTSecretKey!'
+
+    jaeger:
+        image: jaegertracing/all-in-one:${JAEGER}
+        container_name: jaeger
+        environment:
+            COLLECTOR_ZIPKIN_HTTP_PORT: 9411
+        volumes:
+            - ./jaeger/jaeger-ui.json:/etc/jaeger/jaeger-ui.json
+        command: --query.ui-config /etc/jaeger/jaeger-ui.json
+        ports:
+            - "127.0.0.1:16686:16686"
+        networks:
+            - frontend
+            - backend
+        labels:
+            - traefik.enable=true
+            - traefik.docker.network=frontend
+            - traefik.constraint-label=public
+            - traefik.http.routers.jaeger.entrypoints=https
+            - traefik.http.routers.jaeger.tls=true
+            - traefik.http.routers.jaeger.rule=Host(`jaeger.dev.io`)
+            - traefik.http.services.jaeger.loadbalancer.server.port=16686
+
+#    memcached:
+#        image: memcached:${MEMCACHED}
+#        container_name: memcached
+#        ports:
+#            - "127.0.0.1:11211:11211"
+#        networks:
+#            - backend
+#        mem_limit: 128m
+#        tmpfs: /tmp
+#        volumes:
+#            - *x-sock
+#        command: "memcached -s /tmp/docker/memcached.sock -a 777 -o modern"
+#        profiles: [ "full" ]

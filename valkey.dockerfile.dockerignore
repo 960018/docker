@@ -1,0 +1,4 @@
+*
+!valkey.dockerfile
+!global/
+!valkey/

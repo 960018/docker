@@ -39,15 +39,15 @@ RUN     \
             &&  cd .. || exit \
         ) \
 &&      docker-php-ext-enable xdebug \
-&&      ( \
-             cd  runkit7 \
-             &&  phpize \
-             &&  ./configure \
-             &&  make \
-             &&  make install \
-             &&  cd .. || exit \
-         ) \
-&&      docker-php-ext-enable runkit7 \
+#&&      ( \
+#             cd  runkit7 \
+#             &&  phpize \
+#             &&  ./configure \
+#             &&  make \
+#             &&  make install \
+#             &&  cd .. || exit \
+#         ) \
+#&&      docker-php-ext-enable runkit7 \
 &&      ( \
              cd  php-spx \
              &&  phpize \
@@ -62,7 +62,7 @@ RUN     \
 &&      echo xdebug.client_host=host.docker.internal >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
 &&      echo xdebug.start_with_request=trigger >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
 &&      echo xdebug.log=/tmp/xdebug.log >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-&&      echo runkit.internal_override=1 >> /usr/local/etc/php/conf.d/docker-php-ext-runkit7.ini \
+#&&      echo runkit.internal_override=1 >> /usr/local/etc/php/conf.d/docker-php-ext-runkit7.ini \
 &&      echo spx.http_enabled=1 >> /usr/local/etc/php/conf.d/docker-php-ext-spx.ini \
 &&      echo spx.http_key="vairogs" >> /usr/local/etc/php/conf.d/docker-php-ext-spx.ini \
 &&      echo spx.http_ip_whitelist="*" >> /usr/local/etc/php/conf.d/docker-php-ext-spx.ini \
@@ -75,7 +75,7 @@ RUN     \
 &&      echo 'alias req="composer require -nW --ignore-platform-reqs"' >> /home/vairogs/.bashrc \
 &&      echo 'alias rem="composer remove -nW --ignore-platform-reqs"' >> /home/vairogs/.bashrc \
 &&      apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false autoconf dpkg-dev make libc-dev libc6-dev file \
-            pkgconf re2c bison cpp gcc g++ gcc-13 cpp-13 fontconfig zlib1g-dev \
+            pkgconf re2c bison cpp gcc g++ gcc-14 cpp-14 fontconfig zlib1g-dev \
 &&      apt-get autoremove -y --purge \
 &&      mkdir --parents /usr/share/misc/php-spx \
 &&      cp -r php-spx/assets /usr/share/misc/php-spx \

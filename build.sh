@@ -38,6 +38,9 @@ docker pull ghcr.io/960018/node:22-$ARCH                                        
 docker buildx build --tag ghcr.io/960018/node:22-$ARCH-ip           ${BOP} -f node.script.dockerfile --build-arg ARCH=$ARCH --build-arg SCRIPT=ip .   || exit
 docker buildx build --tag ghcr.io/960018/node:22-$ARCH-echo         ${BOP} -f node.script.dockerfile --build-arg ARCH=$ARCH --build-arg SCRIPT=echo . || exit
 
+docker buildx build --tag ghcr.io/960018/valkey-base:$ARCH          ${BOP} -f valkey.base.dockerfile .                                                || exit
+docker buildx build --tag ghcr.io/960018/valkey:$ARCH               ${BOP} -f valkey.dockerfile --build-arg ARCH=$ARCH .                              || exit
+
 docker buildx build --tag ghcr.io/960018/curl:$ARCH                 ${BOP} -f curl.dockerfile --build-arg ARCH=$ARCH .                                || exit
 docker pull ghcr.io/960018/curl:$ARCH                                                                                                                 || exit
 
@@ -48,7 +51,8 @@ docker buildx build --tag ghcr.io/960018/php-fpm:$ARCH-sock         ${BOP} -f ph
 docker pull ghcr.io/960018/php-fpm:testing-$ARCH                                                                                                      || exit
 docker buildx build --tag ghcr.io/960018/php-fpm:testing-$ARCH-sock ${BOP} -f php.testing.sock.dockerfile --build-arg ARCH=$ARCH .                    || exit
 
-docker pull ghcr.io/960018/nginx:$ARCH                                                                                                                || exit
-docker buildx build --tag ghcr.io/960018/builder:$ARCH              ${BOP} -f builder.dockerfile --build-arg ARCH=$ARCH .                             || exit
+#docker pull ghcr.io/960018/nginx:$ARCH                                                                                                                || exit
+#docker buildx build --tag ghcr.io/960018/builder:$ARCH              ${BOP} -f builder.dockerfile --build-arg ARCH=$ARCH .                             || exit
+#docker buildx build --tag ghcr.io/960018/php-zts:$ARCH              ${BOP} -f php.zts.dockerfile --build-arg ARCH=$ARCH .                                 || exit
 
 docker rm -f buildx_buildkit_master0                                                                                                                  || exit

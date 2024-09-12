@@ -34,10 +34,10 @@ RUN     \
 &&      apt-get update \
 &&      apt-get upgrade -y \
 &&      apt-get install -y --no-install-recommends --allow-downgrades make libc-dev libc6-dev gcc g++ cpp bison git dpkg-dev autoconf re2c libxml2-dev libxml2 libsqlite3-dev libsqlite3-0 xz-utils libargon2-dev libargon2-1 \
-            libonig-dev libonig5 libreadline-dev libreadline8t64 libsodium-dev libsodium23 zlib1g-dev zlib1g libbz2-dev libbz2-1.0 libgmp-dev libgmp10 libedit-dev libedit2 libtidy-dev libtidy5deb1 libnghttp3-dev libnghttp3-9 \
+            libonig-dev libonig5 libsodium-dev libsodium23 zlib1g-dev zlib1g libbz2-dev libbz2-1.0 libgmp-dev libgmp10 libedit-dev libedit2 libtidy-dev libtidy58 libnghttp3-dev libnghttp3-9 valgrind \
             libnghttp2-dev nghttp2 idn2 libidn2-0 librtmp-dev librtmp1 rtmpdump libgsasl-dev libgsasl18 libpsl-dev libpsl5t64 zstd libzstd-dev libbrotli1 libbrotli-dev libjpeg62-turbo libjpeg62-turbo-dev libpng16-16t64 libpng-dev \
             libwebp7 libwebp-dev libfreetype-dev libfreetype6 liblzf-dev liblzf1 liblzf-dev liblzf1 liblz4-dev liblzf-dev liblz4-1 gdb-minimal libfcgi-bin wget cron libssl-dev libssl3t64 libhiredis1.1.0 libhiredis-dev libpq5 libpq-dev \
-            libzip4t64 libzip-dev libmagickwand-6.q16-dev libmagickwand-6.q16-7t64 libmagickcore-6.q16-7t64 libmagickcore-6.q16-dev libevent-2.1-7t64 libevent-dev \
+            libzip4t64 libzip-dev libmagickwand-6.q16-dev libmagickwand-6.q16-7t64 libmagickcore-6.q16-7t64 libmagickcore-6.q16-dev libevent-2.1-7t64 libevent-openssl-2.1-7t64 libevent-extra-2.1-7t64 libevent-core-2.1-7t64 libevent-pthreads-2.1-7t64 libevent-dev \
 &&      chmod -R 1777 /usr/local/bin \
 &&      mkdir --parents "$PHP_INI_DIR/conf.d" \
 &&      [ ! -d /var/www/html ]; \
@@ -69,7 +69,7 @@ RUN     \
             --enable-mbstring \
             --enable-opcache \
             --enable-option-checking=fatal \
-            --enable-pcntl \
+#            --enable-pcntl \
             --enable-sysvsem \
             --enable-sysvshm \
             --enable-sysvmsg \
@@ -81,7 +81,7 @@ RUN     \
             --with-fpm-group=vairogs \
             --with-fpm-user=vairogs \
             --with-gmp \
-            --with-libedit \
+#            --with-libedit \
             --with-mhash \
             --with-openssl \
             --with-password-argon2 \
@@ -89,11 +89,12 @@ RUN     \
             --with-pic \
             --with-pdo-pgsql \
             --with-pdo-sqlite=/usr \
-            --with-readline \
             --with-sodium=shared \
             --with-sqlite3=/usr \
             --with-tidy \
+            --with-valgrind \
             --with-zlib \
+            --without-readline \
 &&      make \
 &&      find -type f -name '*.a' -delete \
 &&      make install \
@@ -122,6 +123,7 @@ COPY    php/clone/apcusrc/ /home/vairogs/extensions/apcu/
 COPY    php/clone/pecl-eventsrc/ /home/vairogs/extensions/pecl-event/
 COPY    php/clone/ext-dssrc/ /home/vairogs/extensions/ext-ds/
 COPY    php/clone/php_zipsrc/ /home/vairogs/extensions/php_zip/
+COPY    php/clone/mediawiki-php-excimersrc/ /home/vairogs/extensions/mediawiki-php-excimer/
 
 WORKDIR /home/vairogs/extensions
 
@@ -181,13 +183,17 @@ RUN     \
         set -eux \
 &&      install-php-extensions simdjson
 
-RUN     \
-        set -eux \
-&&      install-php-extensions yac
+#RUN     \
+#        set -eux \
+#&&      install-php-extensions yac
 
 RUN     \
         set -eux \
-&&      install-php-extensions yaml
+&&      install-php-extensions uuid
+
+#RUN     \
+#        set -eux \
+#&&      install-php-extensions yaml
 
 #RUN     \
 #        set -eux \
@@ -259,10 +265,19 @@ RUN     \
             &&  cd .. || exit \
         ) \
 &&      docker-php-ext-enable event \
+&&      ( \
+            cd  mediawiki-php-excimer \
+            &&  phpize \
+            &&  ./configure \
+            &&  make \
+            &&  make install \
+            &&  cd .. || exit \
+        ) \
+&&      docker-php-ext-enable excimer \
 &&      apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false make libc-dev libc6-dev cpp gcc g++ autoconf dpkg-dev re2c bison libxml2-dev libssl-dev libsqlite3-dev xz-utils libargon2-dev \
-            libnghttp3-dev libonig-dev libreadline-dev libsodium-dev zlib1g-dev libbz2-dev libgmp-dev libedit-dev libtidy-dev libnghttp2-dev librtmp-dev libgsasl-dev libpsl-dev libzstd-dev libcrypt-dev \
+            libnghttp3-dev libonig-dev libsodium-dev zlib1g-dev libbz2-dev libgmp-dev libedit-dev libtidy-dev libnghttp2-dev librtmp-dev libgsasl-dev libpsl-dev libzstd-dev libcrypt-dev \
             libbrotli-dev libjpeg62-turbo-dev libpng-dev libwebp-dev libfreetype-dev liblz4-dev liblzf-dev pkgconf make icu-devtools libbsd-dev libc-dev-bin libc6-dev libgssglue-dev libhiredis-dev libicu-dev \
-            libidn-dev libidn2-dev libmd-dev libncurses-dev libntlm0-dev libp11-kit-dev libtasn1-6-dev linux-libc-dev cpp-13 gcc-13 fontconfig libpq-dev \
+            libidn-dev libidn2-dev libmd-dev libncurses-dev libntlm0-dev libp11-kit-dev libtasn1-6-dev linux-libc-dev cpp-14 gcc-14 fontconfig libpq-dev \
             libzip-dev libmagickwand-6.q16-dev libmagickcore-6.q16-dev libevent-dev \
 &&      apt-get autoremove -y --purge \
 &&      rm -rf \

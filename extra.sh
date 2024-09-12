@@ -20,10 +20,7 @@ docker login ghcr.io -u "$CR_USER" --password "$CR_PAT" || exit
 
 source .env
 
-docker pull "portainer/agent:$PORTAINER" || exit
-docker pull "portainer/portainer-ce:$PORTAINER" || exit
-docker pull "dunglas/mercure:$MERCURE" || exit
-docker pull "ghcr.io/gethomepage/homepage:latest" || exit
+docker compose -f docker-compose.extra.yaml pull --parallel || exit
 
 if [ -z $(docker network ls --filter name=^frontend$ --format="{{ .Name }}") ]; then
     docker network create frontend;

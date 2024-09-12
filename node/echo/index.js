@@ -9,6 +9,7 @@ const app = express();
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+app.disable('x-powered-by');
 app.set("json spaces", 4);
 app.set("trust proxy", true);
 

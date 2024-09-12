@@ -4,6 +4,7 @@ import sanitizeHtml from "sanitize-html";
 
 const app = express();
 
+app.disable('x-powered-by');
 app.set("trust proxy", true);
 
 app.all("*", (req, res) => {

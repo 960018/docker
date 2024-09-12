@@ -20,16 +20,7 @@ docker login ghcr.io -u "$CR_USER" --password "$CR_PAT" || exit
 
 source .env
 
-docker pull "traefik:$TRAEFIK" || exit
-docker pull "ghcr.io/960018/keydb:$ARCH" || exit
-docker pull "postgres:$POSTGRES13" || exit
-docker pull "postgres:$POSTGRES14" || exit
-docker pull "postgres:$POSTGRES15" || exit
-docker pull "postgres:$POSTGRES16" || exit
-docker pull "postgres:$POSTGRES17" || exit
-docker pull "memcached:$MEMCACHED" || exit
-docker pull "bash:devel" || exit
-docker pull "justarchi/archisteamfarm:released" || exit
+docker compose -f docker-compose.start.yaml pull --parallel || exit
 
 if [ -z $(docker network ls --filter name=^frontend$ --format="{{ .Name }}") ]; then
     docker network create frontend;

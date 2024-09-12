@@ -132,6 +132,8 @@ services:
             - "127.0.0.1:6379:6379"
         mem_limit: 64m
         tmpfs: /tmp
+        ulimits:
+            memlock: -1
         depends_on:
             - tmp
         healthcheck:
@@ -261,16 +263,65 @@ services:
             retries: 5
         profiles: [ "full" ]
 
-    memcached:
-        image: memcached:${MEMCACHED}
-        container_name: memcached
-        ports:
-            - "127.0.0.1:11211:11211"
+#    valkey:
+#        image: ghcr.io/960018/valkey:${ARCH}
+#        container_name: valkey
+#        networks:
+#            - backend
+#        restart: always
+#        volumes:
+#            - *x-sock
+#        ports:
+#            - "127.0.0.1:6378:6379"
+#        mem_limit: 64m
+#        tmpfs: /tmp
+#        ulimits:
+#            memlock: -1
+#        depends_on:
+#            - tmp
+#        healthcheck:
+#            test: [ "CMD", "valkey-cli", "--raw", "incr", "ping" ]
+#            interval: 10s
+#            timeout: 5s
+#            retries: 5
+#        profiles: [ "full", "local" ]
+
+    dragonfly:
+        image: docker.dragonflydb.io/dragonflydb/dragonfly
+        container_name: dragonfly
         networks:
             - backend
-        mem_limit: 128m
-        tmpfs: /tmp
+        restart: always
         volumes:
             - *x-sock
-        command: "memcached -s /tmp/docker/memcached.sock -a 777 -o modern"
-        profiles: ["full"]
+        ports:
+            - "127.0.0.1:6377:6379"
+        mem_limit: 3g
+        tmpfs: /tmp
+        ulimits:
+            memlock: -1
+        depends_on:
+            - tmp
+        healthcheck:
+            test: [ "CMD", "/usr/local/bin/healthcheck.sh" ]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+        profiles: [ "full", "local" ]
+        command: --unixsocket /tmp/docker/dragonfly.sock --unixsocketperm 777 --logtostderr --memcached_port 11211
+
+    relay:
+        image: getsentry/relay:nightly
+        container_name: relay
+        networks:
+            - backend
+            - frontend
+        restart: unless-stopped
+        ports:
+            - "3000:3000"
+        volumes:
+            - ./relay:/work/.relay/:z
+        mem_limit: 128m
+        tty: true
+        tmpfs: /tmp
+        profiles: [ "full", "local" ]
